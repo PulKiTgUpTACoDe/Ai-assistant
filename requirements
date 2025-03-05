@@ -1,0 +1,10 @@
+speechrecognition
+pyttsx3
+yt-dlp
+vlc
+requests
+pyautogui
+langdetect
+googletrans
+pycaw
+google-generativeai
