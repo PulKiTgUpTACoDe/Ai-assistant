@@ -21,7 +21,7 @@ ai-agent/core/utils/__pycache__/
 # Sensitive information
 ai-agent/config/__pycache__/
 ai-agent/config/config.py
-.env
+ai-agent/.env
 ai-agent/services/__pycache__/
 ai-agent/__pycache__/
 
