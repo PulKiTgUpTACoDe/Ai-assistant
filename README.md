@@ -1,4 +1,5 @@
-# AI Agent
+# AI Voice Agent
+![image](https://github.com/user-attachments/assets/aadac9d8-d439-4d24-bd35-ce85552b4835)
 
 A Python-based AI voice agent that can perform various tasks using voice commands and natural language processing.
 
