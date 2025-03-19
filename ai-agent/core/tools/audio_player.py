@@ -1,6 +1,12 @@
 import yt_dlp
 import vlc
-from ..audio.text_to_speech import say
+import os
+import sys
+
+# Add parent directory to path to help with imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+from core.tools.speech_synthesis import say
 
 player = None
 
@@ -33,4 +39,4 @@ def stop_music():
     if player is not None:
         player.stop()
         player = None
-        say("Music stopped.")
+        say("Music stopped.") 

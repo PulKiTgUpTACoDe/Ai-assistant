@@ -1,5 +1,11 @@
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-from ..audio.text_to_speech import say
+import os
+import sys
+
+# Add parent directory to path to help with imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+from core.tools.speech_synthesis import say
 
 def set_volume(level):
     level = max(0, min(100, level)) 
@@ -27,4 +33,4 @@ def decrease_volume():
     current_volume = volume.GetMasterVolumeLevelScalar() * 100
     new_volume = max(current_volume - 10, 0)
     volume.SetMasterVolumeLevelScalar(new_volume / 100, None)
-    say(f"Volume decreased to {int(new_volume)}%")
+    say(f"Volume decreased to {int(new_volume)}%") 
