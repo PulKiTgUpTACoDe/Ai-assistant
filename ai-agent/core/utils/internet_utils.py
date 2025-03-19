@@ -17,6 +17,4 @@ def find_and_open_app(app_name):
         return True
     except Exception as e:
         print(f"Error opening app via Windows search: {e}")
-        return False
-
-# play_online_music and stop_music come from audio_player.py
+        return False 

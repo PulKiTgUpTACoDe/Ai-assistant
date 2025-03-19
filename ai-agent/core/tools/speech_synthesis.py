@@ -12,7 +12,7 @@ def say(text, lang="en"):
         speech_queue.put((text, "en"))
         return
 
-    print(f"\nAI ({'Hindi' if lang == 'hi' else 'English'}): {text}")
+    print(f"\nAI: {text}")
     speech_queue.put((text, lang))
 
 def process_speech_queue():
@@ -21,8 +21,6 @@ def process_speech_queue():
     
     # Get available voices and identify Hindi voice
     voices = engine.getProperty('voices')
-    hindi_voice = None
-    english_voice = None
     
     # Set Hindi and English voices
     hindi_voice = voices[2].id 
@@ -46,4 +44,4 @@ def process_speech_queue():
 
             engine.say(text+" ")
             engine.runAndWait()
-            speech_queue.task_done()
+            speech_queue.task_done() 

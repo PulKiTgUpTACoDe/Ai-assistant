@@ -1,7 +1,12 @@
 import os
 import subprocess
 import datetime
-from ..audio.text_to_speech import say
+import sys
+
+# Add parent directory to path to help with imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+from core.tools.speech_synthesis import say
 
 def get_time():
     return datetime.datetime.now().strftime("%H:%M")
@@ -36,4 +41,4 @@ def close_all_applications():
                 except subprocess.CalledProcessError:
                     pass # Handle any errors during task killing
     except Exception as e:
-        print(f"Error closing applications: {e}")
+        print(f"Error closing applications: {e}") 

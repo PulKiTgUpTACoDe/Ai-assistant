@@ -2,7 +2,7 @@ import json
 import os
 
 class ChatHistory:
-    def __init__(self, filename="chat_history.json"):
+    def __init__(self, filename="database/chat_history.json"):
         self.filename = filename
         self.history = self.load_history()
 
@@ -43,4 +43,4 @@ class ChatHistory:
     def reset_history(self):
         """Clears the chat history and saves it to the file."""
         self.history = []
-        self.save_history()
+        self.save_history() 
