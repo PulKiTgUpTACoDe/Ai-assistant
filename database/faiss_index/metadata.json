@@ -1,0 +1,16 @@
+[
+  {
+    "id": 0,
+    "user_message": "hello how are you",
+    "ai_message": "I am doing well, thank you for asking. How can I help you today?\n",
+    "context": {},
+    "timestamp": 0
+  },
+  {
+    "id": 1,
+    "user_message": "what can you help me with",
+    "ai_message": "I can help you with a wide range of tasks, including:\n\n*   Answering questions on a variety of topics\n*   Providing summaries of factual topics or creating stories\n*   Translating languages\n*   Generating different creative text formats, like poems, code, scripts, musical pieces, email, letters, etc.\n*   Following your instructions and completing your requests thoughtfully.\n",
+    "context": {},
+    "timestamp": 1742375825.662968
+  }
+]
