@@ -1,8 +1,6 @@
 # Created by venv; see https://docs.python.org/3/library/venv.html
 
 # Python virtual environment
-config
-README.md
 test.py
 share
 Scripts
@@ -11,6 +9,10 @@ Include
 .cache
 Lib
 pyvenv.cfg
+
+# Environment variables
+.env
+ai-agent/.env
 
 # Project specific
 ai-agent/database/chat_history.json
@@ -22,7 +24,6 @@ ai-agent/core/utils/__pycache__/
 # Sensitive information
 ai-agent/config/__pycache__/
 ai-agent/config/config.py
-.env
 ai-agent/services/__pycache__/
 ai-agent/__pycache__/
 

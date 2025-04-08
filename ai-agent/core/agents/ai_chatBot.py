@@ -1,8 +1,7 @@
 from google import genai
-from openai import OpenAI
 from langdetect import detect
 
-class GeminiAI:
+class ChatBot:
     def __init__(self, api_key):
         self.client = genai.Client(api_key=api_key)
 
@@ -13,7 +12,7 @@ class GeminiAI:
         input_lang = detect(query) if query else 'en'
 
         # Add language context to system message
-        system_msg = f"You are a helpful assistant. Respond in {input_lang} text strictly. if the input is in Hindi then only respond in Hindi text else English."
+        system_msg = f"You are a helpful assistant. Respond in {input_lang} text strictly. if the input is in Hindi then respond in Hindi text else English."
 
         try:
             prompt = f"{chat_history}\n{query}"

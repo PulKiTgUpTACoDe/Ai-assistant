@@ -13,15 +13,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Import core components
 from core.tools import speech_recognition, speech_synthesis, audio_player
 from core.utils import system_commands, internet_utils, file_utils, volume_control, weather
-from core.agents import gemini
+from core.agents import ai_chatBot
 from core.memory import chat_history
-from config import config
 
 # Initialize components
 speech_queue = speech_synthesis.speech_queue
 control_queue = speech_synthesis.control_queue
-gemini_ai = gemini.GeminiAI(api_key=os.getenv("GEMINI_API_KEY", ""))
-chat_history_manager = chat_history.ChatHistory()
+ai_chat = ai_chatBot.ChatBot(api_key=os.getenv("GEMINI_API_KEY"))
+chat_history_manager = chat_history.ChatHistory(session_only=True)
 music_playing = False
 
 def handle_command(query):
@@ -79,11 +78,24 @@ def handle_command(query):
 
     elif "exit" in query:
         speech_synthesis.say("Goodbye sir!")
+        
         sys.exit()
 
     else:
-        # Handle natural language queries
-        response, lang = gemini_ai.chat(query, chat_history_manager.get_history())
+        # Get relevant context from vector memory
+        relevant_context = chat_history_manager.get_relevant_context(query)
+        
+        # Get recent chat history (last 10 messages)
+        recent_history = chat_history_manager.get_history(max_messages=10)
+        
+        # Combine recent history with relevant context from vector memory
+        if relevant_context:
+            combined_context = f"{relevant_context}\n\nRecent conversation:\n{recent_history}"
+        else:
+            combined_context = recent_history
+        
+        # Handle natural language queries with enhanced context
+        response, lang = ai_chat.chat(query, combined_context)
         chat_history_manager.add_message(query, response)
 
         # Speak and print the response
@@ -100,14 +112,21 @@ if __name__ == '__main__':
     # Initial activation message
     speech_synthesis.say("AI assistant is now active.")
 
-    while True:
-        query = speech_recognition.takeCommand()
-        if query and not music_playing:
-            handle_command(query)
-        elif music_playing and query:
-            if "stop" in query:
-                audio_player.stop_music()
-                music_playing = False
-        else:
-            continue
+    try:
+        while True:
+            query = speech_recognition.takeCommand()
+            if query and not music_playing:
+                handle_command(query)
+            elif music_playing and query:
+                if "stop" in query:
+                    audio_player.stop_music()
+                    music_playing = False
+            else:
+                continue
+    except KeyboardInterrupt:
+        print("\nShutting down...")
+        chat_history_manager.end_session()
+    except Exception as e:
+        print(f"\nError: {e}")
+        chat_history_manager.end_session()
         
