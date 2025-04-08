@@ -12,7 +12,7 @@ class ChatBot:
         input_lang = detect(query) if query else 'en'
 
         # Add language context to system message
-        system_msg = f"You are a helpful assistant. Respond in {input_lang} text strictly. if the input is in Hindi then only respond in Hindi text else English."
+        system_msg = f"You are a helpful assistant. Respond in {input_lang} text strictly. if the input is in Hindi then respond in Hindi text else English."
 
         try:
             prompt = f"{chat_history}\n{query}"

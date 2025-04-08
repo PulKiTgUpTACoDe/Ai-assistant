@@ -11,7 +11,7 @@ load_dotenv()
 
 class VectorMemory:
     def __init__(self, 
-                 index_directory: str = os.getenv("VECTOR_DB_PATH", "database/faiss_index"),
+                 index_directory: str = os.getenv("VECTOR_DB_PATH"),
                  model_name: str = "all-MiniLM-L6-v2",
                  dimension: int = 384):
         """

@@ -124,11 +124,9 @@ if __name__ == '__main__':
             else:
                 continue
     except KeyboardInterrupt:
-        # Handle ctrl+c gracefully
         print("\nShutting down...")
         chat_history_manager.end_session()
     except Exception as e:
-        # Handle other exceptions
         print(f"\nError: {e}")
         chat_history_manager.end_session()
         
