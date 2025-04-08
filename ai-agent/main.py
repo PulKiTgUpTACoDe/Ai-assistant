@@ -79,8 +79,6 @@ def handle_command(query):
 
     elif "exit" in query:
         speech_synthesis.say("Goodbye sir!")
-        with open("database/chat_history.json", "w") as f:
-            f.truncate(0)
         sys.exit()
 
     else:
