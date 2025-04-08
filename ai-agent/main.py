@@ -13,14 +13,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Import core components
 from core.tools import speech_recognition, speech_synthesis, audio_player
 from core.utils import system_commands, internet_utils, file_utils, volume_control, weather
-from core.agents import gemini
+from core.agents import ai_chatBot
 from core.memory import chat_history
-from config import config
 
 # Initialize components
 speech_queue = speech_synthesis.speech_queue
 control_queue = speech_synthesis.control_queue
-gemini_ai = gemini.GeminiAI(api_key=os.getenv("GEMINI_API_KEY", ""))
+ai_chat = ai_chatBot.ChatBot(api_key=os.getenv("GEMINI_API_KEY"))
 chat_history_manager = chat_history.ChatHistory(session_only=True)
 music_playing = False
 
@@ -79,7 +78,6 @@ def handle_command(query):
 
     elif "exit" in query:
         speech_synthesis.say("Goodbye sir!")
-        # End the session and clear vector memory
         chat_history_manager.end_session()
         sys.exit()
 
@@ -97,7 +95,7 @@ def handle_command(query):
             combined_context = recent_history
         
         # Handle natural language queries with enhanced context
-        response, lang = gemini_ai.chat(query, combined_context)
+        response, lang = ai_chat.chat(query, combined_context)
         chat_history_manager.add_message(query, response)
 
         # Speak and print the response

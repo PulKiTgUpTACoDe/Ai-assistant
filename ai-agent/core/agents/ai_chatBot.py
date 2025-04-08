@@ -1,8 +1,7 @@
 from google import genai
-from openai import OpenAI
 from langdetect import detect
 
-class GeminiAI:
+class ChatBot:
     def __init__(self, api_key):
         self.client = genai.Client(api_key=api_key)
 
