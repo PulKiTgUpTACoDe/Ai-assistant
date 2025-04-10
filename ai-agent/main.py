@@ -15,12 +15,6 @@ chat_history_manager = chat_history.ChatHistory(session_only=True)
 music_playing = False
 
 def handle_command(query):
-    global music_playing
-
-    if music_playing and "stop" in query.lower():
-        audio_player.music_player.stop()
-        music_playing = False
-        return
 
     try:
         messages = [HumanMessage(content=query)]
@@ -52,9 +46,6 @@ def handle_command(query):
                     final_response = llm.invoke(messages + [first_response] + tool_responses)
                     speech_synthesis.say(final_response.content)
                     chat_history_manager.add_message(query, final_response.content)
-
-                    if tool.name == 'play_music':
-                        music_playing = True
 
                 else:
                     speech_synthesis.say("Sorry, I can't perform that action.")

@@ -1,5 +1,6 @@
 import speech_recognition as sr
-import speech_synthesis
+from . import speech_synthesis
+
 def takeCommand():
     """Improved voice recognition with proper language priority"""
     r = sr.Recognizer()
