@@ -13,17 +13,17 @@ def set_volume(level):
     interface = devices.Activate(IAudioEndpointVolume._iid_,1,None)
     volume = interface.QueryInterface(IAudioEndpointVolume)
     volume.SetMasterVolumeLevelScalar(level/100, None)
-    say(f"Volume set to {level}%")
+    # say(f"Volume set to {level}%")
 
 def increase_volume():
     devices = AudioUtilities.GetSpeakers()
     interface = devices.Activate(
-        IAudioEndpointVolume._iid_, 1, None)
+    IAudioEndpointVolume._iid_, 1, None)
     volume = interface.QueryInterface(IAudioEndpointVolume)
     current_volume = volume.GetMasterVolumeLevelScalar() * 100
     new_volume = min(current_volume + 10, 100)
     volume.SetMasterVolumeLevelScalar(new_volume / 100, None)
-    say(f"Volume increased to {int(new_volume)}%")
+    # say(f"Volume increased to {int(new_volume)}%")
 
 def decrease_volume():
     devices = AudioUtilities.GetSpeakers()
@@ -33,4 +33,4 @@ def decrease_volume():
     current_volume = volume.GetMasterVolumeLevelScalar() * 100
     new_volume = max(current_volume - 10, 0)
     volume.SetMasterVolumeLevelScalar(new_volume / 100, None)
-    say(f"Volume decreased to {int(new_volume)}%") 
+    # say(f"Volume decreased to {int(new_volume)}%") 

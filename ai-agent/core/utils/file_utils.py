@@ -11,4 +11,4 @@ def take_screenshot():
     """Takes a screenshot and saves it."""
     screenshot = pyautogui.screenshot()
     screenshot.save("screenshot.png")
-    say("Screenshot taken and saved.") 
+    # say("Screenshot taken and saved.") 

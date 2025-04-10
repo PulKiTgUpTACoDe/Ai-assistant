@@ -1,5 +1,5 @@
 import speech_recognition as sr
-
+import speech_synthesis
 def takeCommand():
     """Improved voice recognition with proper language priority"""
     r = sr.Recognizer()
@@ -20,3 +20,8 @@ def takeCommand():
         return query.lower()
     except:
         return None 
+    
+def get_confirmation(prompt):
+    speech_synthesis.say(prompt + " Please say yes or no.")
+    response = takeCommand().lower()
+    return response in ['yes', 'y', 'yeah', 'confirm']

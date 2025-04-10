@@ -5,7 +5,6 @@ speech_queue = queue.Queue()
 control_queue = queue.Queue()
 
 def say(text, lang="en"):
-
     # Preserve code blocks in English
     if "```" in text:
         print(f"\n{text}\n")
@@ -19,7 +18,6 @@ def process_speech_queue():
     # Processes speech requests in a dedicated thread
     engine = pyttsx3.init()
     
-    # Get available voices and identify Hindi voice
     voices = engine.getProperty('voices')
     
     # Set Hindi and English voices
@@ -36,7 +34,6 @@ def process_speech_queue():
 
         text, lang = speech_queue.get()
         if text:
-            # Set appropriate voice
             if lang == "hi":
                 engine.setProperty("voice", hindi_voice)
             else:
