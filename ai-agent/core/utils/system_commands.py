@@ -16,14 +16,14 @@ def shutdown_system():
     say("Closing all running applications.")
     close_all_applications()  # Call the function to close apps
     # say("Shutting down the system. Goodbye!")
-    os.system("shutdown /s /t 0")
+    os.system("shutdown /s /t 5")
 
 def restart_system():
     """Closes all running applications and restarts the computer."""
     say("Closing all running applications.")
     close_all_applications()  # Call the function to close apps
     # say("Restarting the system now.")
-    os.system("shutdown /r /t 1")
+    os.system("shutdown /r /t 5")
 
 def close_all_applications():
     """Closes all running applications using taskkill."""

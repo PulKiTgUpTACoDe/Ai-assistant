@@ -1,30 +1,67 @@
 from langchain.tools import tool
 import datetime
-import webbrowser
 import time
 import pyautogui
+from dotenv import load_dotenv
+from typing import Optional, Dict, Any
+from langchain_community.utilities import (
+    SerpAPIWrapper,
+    WolframAlphaAPIWrapper,
+    WikipediaAPIWrapper,
+    AskNewsAPIWrapper
+)
+from langchain.utilities.github import GitHubAPIWrapper
+
+load_dotenv()
 
 @tool
 def open_app(app_name: str):
     """Opens a desktop or web application based on the provided app name."""
     try:
         pyautogui.press('win')
-        time.sleep(0.1)
+        time.sleep(0.5)
         pyautogui.write(app_name)
-        time.sleep(0.1)
+        time.sleep(0.5)
         pyautogui.press('enter')
         return {"result": f"Successfully opened {app_name}"}
     except Exception as e:
         return {"result": f"Failed to open {app_name}: {str(e)}"}
 
 @tool
-def search_google(query: str):
-    """Searches Google for the provided query or topic."""
+def google_search(query: str) -> dict:
+    """Searches Google (via Serper API) for the provided query or topic."""
     try:
-        webbrowser.open(f"https://google.com/search?q={query.replace(' ', '+')}")
-        return {"result": f"Searching Google for {query}"}
+        search = SerpAPIWrapper()
+        result = search.run(query)
+        return {"result": result}
     except Exception as e:
-        return {"result": f"Search failed: {str(e)}"}
+        return {"error": str(e)}
+
+@tool
+def wikipedia(query: str) -> Any:
+    """Searches Wkipedia for the provided query or topic."""
+    try:
+        search = WikipediaAPIWrapper()
+        result = search.load(query)
+        return {"result": result}
+    except Exception as e:
+        return {"error": str(e)}
+    
+@tool
+def math_calc(query: str) -> dict:
+    """Solve complex math, science, and computational problems. Input should be a precise question."""
+
+    wolfram_client = WolframAlphaAPIWrapper()
+    result = wolfram_client.run(query)
+    return {'result':result}
+
+@tool
+def get_news(query: str) -> str:
+    """This tool gives a thorough news about any topic that is asked. When the user asks about any kind of information that could be in the world news use this tool"""
+
+    news = AskNewsAPIWrapper()
+    result = news.search_news(query)
+    return result
 
 @tool
 def play_music(song_name: str):
@@ -36,6 +73,13 @@ def play_music(song_name: str):
     except Exception as e:
         return {"result": f"Failed to play music: {str(e)}"}
 
+# langchain_tools.py
+@tool
+def stop_music() -> dict:
+    """Stops any currently playing music when user requests to stop. Use phrases like 'stop music', 'pause song', or 'I want to stop listening'."""
+    from core.tools import audio_player
+    return audio_player.stop_music()
+
 @tool
 def get_current_time() -> str:
     """Returns the current system time."""
@@ -43,6 +87,12 @@ def get_current_time() -> str:
         return {"result": datetime.datetime.now().strftime("%H:%M")}
     except Exception as e:
         return {"result": f"Failed to get time: {str(e)}"}
+
+@tool
+def recall_context(query: str) -> str:
+    """Recall relevant information from previous conversations when user refers to past discussions. Use phrases like 'remember when', 'as we discussed', etc."""
+    from core.memory.chat_history import ChatHistory
+    return ChatHistory.get_relevant_context(query, k=3)
 
 @tool
 def shutdown():
@@ -123,12 +173,11 @@ def exit():
         chat_history_manager = chat_history.ChatHistory(session_only=True)
         chat_history_manager.end_session()
         sys.exit()
-        return {"result": "Goodbye!"}
     except Exception as e:
         return {"result": f"Exit failed: {str(e)}"}
 
 tools = [
-    open_app, search_google, play_music, get_current_time,
+    open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, recall_context,
     screenshot, weather, shutdown, restart,
     set_volume, increase_volume, decrease_volume, exit
 ]

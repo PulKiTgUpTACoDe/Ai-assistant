@@ -110,8 +110,7 @@ class VectorMemory:
             return []
         
         # Get query embedding
-        query_embedding = self.model.encode([query])[0]
-        query_embedding = np.array([query_embedding], dtype=np.float32)
+        query_embedding = self.model.encode([query], convert_to_tensor=True).cpu().numpy()
         faiss.normalize_L2(query_embedding)
         
         # Search FAISS index
