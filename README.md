@@ -13,6 +13,11 @@ A Python-based AI voice agent that can perform various tasks using voice command
 - Music playback
 - Screenshot capture
 - Chat history management
+- Open applications
+- Wikipedia search
+- Math calculations
+- News retrieval
+- Current time retrieval
 
 ## Prerequisites
 
@@ -55,8 +60,36 @@ cp .env.example .env
 5. Add your API keys to the `.env` file:
 
 ```
-GEMINI_API_KEY=your_gemini_api_key
+GOOGLE_API_KEY=your_gemini_api_key
 WEATHER_API_KEY=your_weather_api_key
+DEEPSEEK_API_KEY=api_key
+PICOVOICE_ACCESS_KEY=api_key
+SERPAPI_API_KEY=api_key
+WOLFRAM_ALPHA_APPID=api_id
+
+# GOOGLE_CSE_ID=client_id
+
+# Ask news credenials
+asknews_client_secret='secret'
+asknews_client_id='client_id'
+
+# Configuration
+DEBUG=True
+LOG_LEVEL=INFO
+
+# Database
+VECTOR_DB_PATH=ai-agent/database/faiss_index
+
+# Services
+API_HOST=0.0.0.0
+API_PORT=8000
+WEBSOCKET_PORT=8001
+
+# Langsmith congif
+LANGSMITH_TRACING=true
+LANGSMITH_ENDPOINT="https://api.smith.langchain.com"
+LANGSMITH_API_KEY=api_key
+LANGSMITH_PROJECT="Your project name"
 ```
 
 ## Usage
@@ -66,19 +99,6 @@ WEATHER_API_KEY=your_weather_api_key
 ```bash
 python -m ai-agent.main
 ```
-
-2. Voice Commands:
-
-- "Open [application name]" - Opens specified application
-- "Search for [query]" - Performs web search
-- "Play [song name]" - Plays music
-- "What's the time" - Tells current time
-- "Weather in [city]" - Provides weather information
-- "Take screenshot" - Captures screen
-- "Set volume to [number]" - Adjusts system volume
-- "Increase/Decrease volume" - Adjusts volume
-- "Reset chat" - Clears chat history
-- "Exit" - Closes the assistant
 
 ## Project Structure
 
@@ -126,4 +146,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - Google Gemini AI for natural language processing
 - WeatherAPI for weather information
+- Serper API for web search
+- Wolfram Alpha API for math calculations
+- Wikipedia API for knowledge retrieval
+- AskNews API for news retrieval
 - Various Python libraries used in this project
