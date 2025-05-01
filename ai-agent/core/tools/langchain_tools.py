@@ -3,14 +3,13 @@ import datetime
 import time
 import pyautogui
 from dotenv import load_dotenv
-from typing import Optional, Dict, Any
+from typing import Any, Optional
+from .news_api import NewsAPIWrapper
 from langchain_community.utilities import (
     SerpAPIWrapper,
     WolframAlphaAPIWrapper,
     WikipediaAPIWrapper,
-    AskNewsAPIWrapper
 )
-from langchain.utilities.github import GitHubAPIWrapper
 
 load_dotenv()
 
@@ -56,12 +55,44 @@ def math_calc(query: str) -> dict:
     return {'result':result}
 
 @tool
-def get_news(query: str) -> str:
-    """This tool gives a thorough news about any topic that is asked. When the user asks about any kind of information that could be in the world news use this tool"""
+def get_news(
+    query: str,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    sort_by: str = "relevancy",
+    limit: int = 5
+) -> dict:
+    """This tool gives a thorough news and information about any topic that is asked. Use this when asked about current events or news.
 
-    news = AskNewsAPIWrapper()
-    result = news.search_news(query)
-    return result
+    Args:
+        query: Search keywords (e.g. "artificial intelligence")
+        from_date: Optional start date in YYYY-MM-DD format
+        to_date: Optional end date in YYYY-MM-DD format
+        sort_by: One of 'relevancy', 'popularity', or 'publishedAt'
+        limit: Number of articles to return (1-10) """
+
+    news = NewsAPIWrapper()
+    try:
+        articles = news.search_news(
+            query=query,
+            from_date=from_date,
+            to_date=to_date,
+            sort_by=sort_by,
+            page_size=min(max(limit, 1), 10)
+        )
+        
+        if not articles or "error" in articles[0]:
+            return "No news articles found"
+            
+        formatted_articles = []
+        for article in articles[:limit]:
+            formatted = f"Title: {article['title']}\nSource: {article['source']}\nPublished: {article['published_at']}\nSummary: {article['description']}\nURL: {article['url']}"
+            formatted_articles.append(formatted)
+            
+        return {"result": f"Latest news about {query}:\n\n" + "\n\n".join(formatted_articles)}
+        
+    except Exception as e:
+        return {"error": f"Error fetching news: {str(e)}"}
 
 @tool
 def play_music(song_name: str):
@@ -89,10 +120,11 @@ def get_current_time() -> str:
         return {"result": f"Failed to get time: {str(e)}"}
 
 @tool
-def recall_context(query: str) -> str:
+def recall_context(query: str) -> dict:
     """Recall relevant information from previous conversations when user refers to past discussions. Use phrases like 'remember when', 'as we discussed', etc."""
     from core.memory.chat_history import ChatHistory
-    return ChatHistory.get_relevant_context(query, k=3)
+    chat_history_manager = ChatHistory()
+    return chat_history_manager.get_relevant_context(query, k=3)
 
 @tool
 def shutdown():
@@ -177,7 +209,7 @@ def exit():
         return {"result": f"Exit failed: {str(e)}"}
 
 tools = [
-    open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, recall_context,
+    open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context,
     screenshot, weather, shutdown, restart,
     set_volume, increase_volume, decrease_volume, exit
 ]

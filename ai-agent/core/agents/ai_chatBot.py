@@ -1,28 +1,37 @@
-from google import genai
-from langdetect import detect
+import openai
+from langdetect import detect 
 
 class ChatBot:
     def __init__(self, api_key):
-        self.client = genai.Client(api_key=api_key)
+        openai.api_key = api_key
+        openai.base_url = "https://api.deepseek.com/v1/"
 
     def chat(self, query, chat_history):
-        """Handles AI conversation with language context."""
+        """Handles AI conversation with language context using DeepSeek"""
 
         # Detect input language
         input_lang = detect(query) if query else 'en'
 
-        # Add language context to system message
-        system_msg = f"You are a helpful assistant. Respond in {input_lang} text strictly. if the input is in Hindi then respond in Hindi text else English."
+        # Create system message with language context
+        system_msg = {
+            "role": "system",
+            "content": f"Respond in {input_lang} text strictly. Maintain natural conversation flow."
+        }
 
         try:
-            prompt = f"{chat_history}\n{query}"
+            messages = [
+                system_msg,
+                {"role": "user", "content": f"{chat_history}\n{query}"}
+            ]
 
-            response = self.client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=[system_msg, prompt]
+            response = openai.ChatCompletion.create(
+                model="deepseek-r1",
+                messages=messages,
+                temperature=0.7,
+                max_tokens=2048
             )
 
-            assistant_response = response.text
+            assistant_response = response.choices[0].message.content
             formatted_response = f"\n{assistant_response}\n" if "```" in assistant_response else assistant_response
 
             # Detect response language
