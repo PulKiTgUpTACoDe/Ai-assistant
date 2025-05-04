@@ -22,6 +22,7 @@ ai-agent/core/memory/__pycache__/
 ai-agent/core/utils/__pycache__/
 yolov8m.pt
 yolov8s.pt
+captured_frame_for_analysis.jpg
 
 # Sensitive information
 ai-agent/config/__pycache__/
