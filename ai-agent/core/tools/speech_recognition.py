@@ -29,6 +29,6 @@ def takeCommand():
         return None
 
 def get_confirmation(prompt):
-    speech_synthesis.say(prompt + " Please say yes or no.")
+    speech_synthesis.say(prompt)
     response = takeCommand()
     return response and response.lower() in ['yes', 'y', 'yeah', 'confirm']  

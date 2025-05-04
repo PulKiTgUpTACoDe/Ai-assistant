@@ -5,6 +5,7 @@ import pyautogui
 from dotenv import load_dotenv
 from typing import Any, Optional
 from .news_api import NewsAPIWrapper
+from .object_detection import analyze_visual_input
 from langchain_community.utilities import (
     SerpAPIWrapper,
     WolframAlphaAPIWrapper,
@@ -127,6 +128,16 @@ def recall_context(query: str) -> dict:
     return chat_history_manager.get_relevant_context(query, k=3)
 
 @tool
+def object_detection_visual(query: str) -> dict:
+    """Consider this your new eyes and analyzes the current scene from the camera feed to answer questions or describe what is seen.
+    Use this tool when the user asks about their surroundings, what something looks like,
+    or asks you about your vision.
+    Provide a clear query asking specifically what information is needed from the image."""
+    
+    response = analyze_visual_input(query);
+    return response
+
+@tool
 def shutdown():
     """Shuts down the system immediately."""
     from core.utils import system_commands
@@ -210,6 +221,6 @@ def exit():
 
 tools = [
     open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context,
-    screenshot, weather, shutdown, restart,
+    screenshot, weather, object_detection_visual, shutdown, restart,
     set_volume, increase_volume, decrease_volume, exit
 ]
