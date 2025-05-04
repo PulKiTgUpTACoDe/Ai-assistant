@@ -15,12 +15,15 @@ pyvenv.cfg
 ai-agent/.env
 
 # Project specific
-ai-agent/database/chat_history.json
-ai-agent/database/faiss_index/
+ai-agent/database
 ai-agent/core/tools/__pycache__/
 ai-agent/core/agents/__pycache__/
 ai-agent/core/memory/__pycache__/
 ai-agent/core/utils/__pycache__/
+yolov8m.pt
+yolov8s.pt
+captured_frame_for_analysis.jpg
+
 # Sensitive information
 ai-agent/config/__pycache__/
 ai-agent/config/config.py
