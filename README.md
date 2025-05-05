@@ -5,19 +5,18 @@ A Python-based AI voice agent that can perform various tasks using voice command
 
 ## Features
 
-- Voice recognition and speech synthesis
-- Natural language processing using Google's Gemini AI
-- System control commands (volume, shutdown, restart)
-- Weather information
-- Web search capabilities
-- Music playback
-- Screenshot capture
-- Chat history management
-- Open applications
-- Wikipedia search
-- Math calculations
-- News retrieval
-- Current time retrieval
+- **Voice Recognition & Speech Synthesis**: Real-time voice input and output.
+- **Natural Language Processing**: Powered by Google Gemini AI for advanced language understanding.
+- **Object Detection**: Real-time object detection using YOLOv8 and contextual analysis with Gemini Vision Pro.
+- **System Control**: Commands for shutdown, restart, volume control, and application management.
+- **Web Search**: Google search integration using Serper API.
+- **Music Playback**: Plays music from YouTube using `yt_dlp` and `vlc`.
+- **Weather Information**: Fetches weather data using WeatherAPI.
+- **News Retrieval**: Fetches the latest news using NewsAPI.
+- **Math Calculations**: Complex math and science queries using Wolfram Alpha.
+- **Wikipedia Search**: Provides information from Wikipedia using the Wikipedia API.
+- **Screenshot Capture**: Captures and saves screenshots using `pyautogui`.
+- **Chat History Management**: Stores conversation history using ChromaDB for vector-based memory.
 
 ## Prerequisites
 
@@ -59,10 +58,10 @@ cp .env.example .env
 
 5. Add your API keys to the `.env` file:
 
+
 ```
 GOOGLE_API_KEY=your_gemini_api_key
 WEATHER_API_KEY=your_weather_api_key
-DEEPSEEK_API_KEY=api_key
 PICOVOICE_ACCESS_KEY=api_key
 SERPAPI_API_KEY=api_key
 WOLFRAM_ALPHA_APPID=api_id
@@ -78,7 +77,7 @@ DEBUG=True
 LOG_LEVEL=INFO
 
 # Database
-VECTOR_DB_PATH=ai-agent/database/faiss_index
+VECTOR_DB_PATH=ai-agent/database
 
 # Services
 API_HOST=0.0.0.0
@@ -104,10 +103,10 @@ python -m ai-agent.main
 
 ```
 ai-agent/
-│── config/                  # Configuration files (YAML/JSON)
+│── config/             # Configuration files (YAML/JSON)
 │── core/                    # Core logic
 │   ├── agents/              # AI Agents (LLM, RAG, etc.)
-│   ├── memory/              # Context storage (FAISS, Pinecone, etc.)
+│   ├── memory/              # Context storage (ChromaDB, Pinecone, etc.)
 │   ├── retrieval/           # Information retrieval (RAG-based)
 │   ├── tools/               # External API tools (Google, Wolfram, etc.)
 │   ├── utils/               # Helper functions (file handling, logs, etc.)
@@ -118,8 +117,7 @@ ai-agent/
 │   ├── websocket.py         # Real-time communication
 │
 │── database/                # Long-term storage
-│   ├── faiss_index/         # Vector embeddings storage
-│   ├── chat_history.json    # Persistent conversation history
+│   ├── chroma.sqlite3/         # Vector embeddings storage
 │
 │── web/                     # Frontend UI or chatbot UI
 │── tests/                   # Unit tests & integration tests
@@ -145,9 +143,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Google Gemini AI for natural language processing
+- YOLOv8 for object detection
+- ChromaDB for vector-based memory
 - WeatherAPI for weather information
 - Serper API for web search
 - Wolfram Alpha API for math calculations
 - Wikipedia API for knowledge retrieval
-- AskNews API for news retrieval
+- NewsAPI for news retrieval
 - Various Python libraries used in this project

@@ -1,6 +1,6 @@
 import threading
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 
 load_dotenv()
 
@@ -17,7 +17,20 @@ music_playing = False
 
 def handle_command(query):
     try:
-        messages = [HumanMessage(content=query)]
+        messages = [
+            SystemMessage(
+                content="You are an advanced AI assistant designed to help users with a wide range of tasks. Your capabilities include: "
+                        "1. Voice Interaction: You can listen to and respond to user queries using speech recognition and synthesis. "
+                        "2. Tool Integration: You have access to various tools for tasks like web searching, playing music, getting news, solving math problems, and more. "
+                        "3. Context Awareness: You can recall past conversations and provide relevant context to improve interactions. "
+                        "4. Visual Analysis: You can analyze images and describe what you see using object detection and image recognition. "
+                        "5. System Control: You can perform system operations like shutting down, restarting, or adjusting volume. "
+                        "6. Real-Time Information: You can fetch real-time data like weather, news, and current events. "
+                        "7. Multi-Lingual response: You can respond in english as well as in hindi according to the language of the query and by responding hindi means responding in hindi language but in english text (whatsapp language of India)"
+                        "Your goal is to assist users efficiently, provide accurate information, and execute tasks seamlessly. Always prioritize user safety and confirm before performing critical actions like shutting down or restarting the system."
+            ),
+            HumanMessage(content=query)]
+        
         first_response = llm_with_tools.invoke(messages)
         
         if hasattr(first_response, 'tool_calls') and first_response.tool_calls:
