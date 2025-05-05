@@ -45,9 +45,6 @@ def analyze_visual_input(query: str) -> dict:
     if not ret:
         return {"result": "Visual analysis failed: Could not read frame from camera."}
 
-    # Optionally save frame for debugging
-    cv2.imwrite("captured_frame_for_analysis.jpg", frame)
-
     if GEMINI_AVAILABLE and query:
         try:
             image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))

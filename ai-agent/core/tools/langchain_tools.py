@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from typing import Any, Optional
 from .news_api import NewsAPIWrapper
 from .object_detection import analyze_visual_input
+from .image_recognition import analyze_image
 from langchain_community.utilities import (
     SerpAPIWrapper,
     WolframAlphaAPIWrapper,
@@ -138,6 +139,15 @@ def object_detection_visual(query: str) -> dict:
     return response
 
 @tool
+def image_recognition(query: str) -> dict:
+    """Use this tool when the user says to see or analyse what's on his screen. Using this tool you can now see the screenshot on the screen and be able to provide descripion and analyse the image and objects on the screen.
+    User can ask you same questions in which he wouldn't say to directly use this tool but you yourself have to understant the context of the query and use this tool to give appropriate answers.
+    """
+    
+    response = analyze_image(query);
+    return response
+
+@tool
 def shutdown():
     """Shuts down the system immediately."""
     from core.utils import system_commands
@@ -221,6 +231,6 @@ def exit():
 
 tools = [
     open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context,
-    screenshot, weather, object_detection_visual, shutdown, restart,
+    screenshot, weather, object_detection_visual, image_recognition, shutdown, restart,
     set_volume, increase_volume, decrease_volume, exit
 ]
