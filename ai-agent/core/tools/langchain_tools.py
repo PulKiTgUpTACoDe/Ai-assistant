@@ -7,6 +7,7 @@ from typing import Any, Optional
 from .news_api import NewsAPIWrapper
 from .object_detection import analyze_visual_input
 from .image_recognition import analyze_image
+from .whatsapp_automation import whatsapp_automation
 from langchain_community.utilities import (
     SerpAPIWrapper,
     WolframAlphaAPIWrapper,
@@ -230,7 +231,7 @@ def exit():
         return {"result": f"Exit failed: {str(e)}"}
 
 tools = [
-    open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context,
+    open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context, whatsapp_automation,
     screenshot, weather, object_detection_visual, image_recognition, shutdown, restart,
     set_volume, increase_volume, decrease_volume, exit
 ]
