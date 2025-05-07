@@ -1,0 +1,174 @@
+import pywhatkit as kit
+import pyautogui as pg
+import time
+import os
+from datetime import datetime, timedelta
+from langchain.tools import tool
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.utils.function_calling import convert_to_openai_tool
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+from typing import Optional, Literal
+import pytz
+import subprocess
+
+now = datetime.now(pytz.timezone("Asia/Kolkata")) + timedelta(minutes=1)
+
+llm = ChatGoogleGenerativeAI(
+    api_key=os.getenv("GOOGLE_API_KEY"), 
+    model="gemini-2.0-flash",
+    temperature=0.7
+)
+
+@tool
+def is_whatsapp_desktop_installed() -> dict:
+    """Check if the whatsapp app is installed on desktop or not"""
+
+    try:
+        result = subprocess.run(
+            ['powershell', '-Command', 'Get-AppxPackage -Name "*WhatsApp*"'],
+            capture_output=True, text=True
+        )
+        return {"result": "WhatsApp" in result.stdout}
+    except Exception as e:
+        return {"result": False}
+
+@tool
+def whatsapp_automation_app(recipient: str, message: str) -> dict:
+    """Sends message on whatsApp app which is downloaded on desktop
+    Args:
+        recipient: The Name or phone number (for individuals) or Group Name(for groups).
+        message: The message to send. Optional if sending only an image.
+    """
+    try:
+        pg.press('win')
+        time.sleep(1)
+        pg.write('whatsapp')
+        time.sleep(1)
+        pg.press('enter')
+        time.sleep(5)
+
+        pg.write(recipient)
+        time.sleep(2)
+        pg.press('down')
+        pg.press('enter')
+        time.sleep(1)
+        pg.write(message)
+        time.sleep(1)
+        pg.press('enter')
+        return {"result": f"Message sent to {recipient} via app"}
+    
+    except Exception as e:
+        return {"result": f"Failed to send WhatsApp message via app: {str(e)}"}
+
+@tool
+def whatsapp_automation_web(
+    phone_number: str,
+    message: Optional[str] = None,
+    image_path: Optional[str] = None,
+    caption: Optional[str] = "",
+    time_hour: Optional[int] = None,
+    time_minute: Optional[int] = None,
+    recipient_type: Literal["individual", "group"] = "individual"
+) -> dict:
+    """
+    Sends a WhatsApp message, image, or both to an individual or group on webApp.
+    
+    Args:
+        recipient_number: The phone number (for individuals) or group ID/invite link (for groups).
+        message: The message to send. Optional if sending only an image.
+        image_path: The path to the image file. Optional if sending only a message.
+        caption: Optional caption for the image.
+        time_hour: Only set the hour when user has asked to do it else set it to 0 hours. The hour (24-hour format) to send the message/image. If None, sends immediately.
+        time_minute: Set the minute when user says to set else set it to 0 minutes. The minute to send the message/image. If None, sends immediately.
+        recipient_type: Whether the recipient is an "individual" or a "group".
+
+    Returns:
+        A dictionary with the result or error message.
+    """
+        
+    try:
+        if recipient_type == "individual":
+            if message and image_path:
+                if time_hour is None or time_minute is None:
+                    kit.sendwhatmsg(phone_number, message, now.hour, now.minute)
+                    time.sleep(10)
+                    kit.sendwhats_image(phone_number, image_path, caption)
+                    return {"result": f"Message and image sent to {phone_number} via web"}
+                else:
+                    kit.sendwhatmsg(phone_number, message, time_hour, time_minute)
+                    kit.sendwhats_image(phone_number, image_path, caption, time_hour, time_minute)
+                    return {"result": f"Message and image scheduled for {phone_number} at {time_hour}:{time_minute}"}
+
+            elif message:
+                if time_hour is None or time_minute is None:
+                    kit.sendwhatmsg(phone_number, message, now.hour, now.minute)
+                    return {"result": f"Message sent to {phone_number} via web"}
+                else:
+                    kit.sendwhatmsg(phone_number, message, time_hour, time_minute)
+                    return {"result": f"Message scheduled for {phone_number} at {time_hour}:{time_minute}"}
+
+            elif image_path:
+                if time_hour is None or time_minute is None:
+                    kit.sendwhats_image(phone_number, image_path, caption)
+                    return {"result": f"Image sent to {phone_number} via web"}
+                else:
+                    kit.sendwhats_image(phone_number, image_path, caption, time_hour, time_minute)
+                    return {"result": f"Image scheduled for {phone_number} at {time_hour}:{time_minute}"}
+            else:
+                return {"result": "Please provide a message or image."}
+
+        elif recipient_type == "group":
+            if message and image_path:
+                kit.sendwhatmsg_to_group(phone_number, message, now.hour, now.minute)
+                time.sleep(10)
+                kit.sendwhats_image_to_group(phone_number, image_path, caption)
+                return {"result": f"Message and image sent to group {phone_number}"}
+            elif message:
+                kit.sendwhatmsg_to_group(phone_number, message, now.hour, now.minute)
+                return {"result": f"Message sent to group {phone_number}"}
+            elif image_path:
+                kit.sendwhats_image_to_group(phone_number, image_path, caption)
+                return {"result": f"Image sent to group {phone_number}"}
+            else:
+                return {"result": "Please provide a message or image."}
+    except Exception as e:
+        return {"result": f"Failed to send WhatsApp message/image: {str(e)}"}
+
+
+def get_message_for_whatsapp(query: str) -> dict:
+    tools = [is_whatsapp_desktop_installed, whatsapp_automation_app, whatsapp_automation_web]
+    
+    formatted_tools = [convert_to_openai_tool(t) for t in tools]
+    llm_with_tools = llm.bind_tools(formatted_tools)
+
+    messages = [
+        SystemMessage(
+            content="You are a WhatsApp message sender and know how to format and send messages formally or informally to a particular recipient or group."
+        ),
+        HumanMessage(content=query)
+    ]
+
+    try:
+        result = llm_with_tools.invoke(messages)
+
+        # If it returns tool calls, run them
+        if hasattr(result, "tool_calls") and result.tool_calls:
+            tool_responses = []
+            for tool_call in result.tool_calls:
+                tool = next((t for t in tools if t.name == tool_call['name']), None)
+                if tool:
+                    res = tool.invoke(tool_call["args"])
+                    tool_responses.append(ToolMessage(
+                        content=str(res['result']),
+                        tool_call_id=tool_call["id"]
+                    ))
+
+            final_response = llm.invoke(messages + [result] + tool_responses)
+            return {"result": final_response.content}
+
+        return {"result": result.content}
+
+    except Exception as e:
+        return {"result": f"Failed to process WhatsApp message: {str(e)}"}
+
+    
