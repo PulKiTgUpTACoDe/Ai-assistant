@@ -7,7 +7,7 @@ from typing import Any, Optional
 from .news_api import NewsAPIWrapper
 from .object_detection import analyze_visual_input
 from .image_recognition import analyze_image
-from .whatsapp_automation import whatsapp_automation
+from .whatsapp_automation import get_message_for_whatsapp
 from langchain_community.utilities import (
     SerpAPIWrapper,
     WolframAlphaAPIWrapper,
@@ -56,6 +56,14 @@ def math_calc(query: str) -> dict:
     wolfram_client = WolframAlphaAPIWrapper()
     result = wolfram_client.run(query)
     return {'result':result}
+
+@tool
+def send_whatsApp_message(query: str) -> dict:
+    """Sends a message on whatsapp on the users request or if necessary
+    The query would contain atleast the recipient's name/phone number to which the message is to be sent and the message content that has to be sent.
+    """
+
+    return get_message_for_whatsapp(query)
 
 @tool
 def get_news(
@@ -231,7 +239,7 @@ def exit():
         return {"result": f"Exit failed: {str(e)}"}
 
 tools = [
-    open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context, whatsapp_automation,
+    open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context, send_whatsApp_message,
     screenshot, weather, object_detection_visual, image_recognition, shutdown, restart,
     set_volume, increase_volume, decrease_volume, exit
 ]
