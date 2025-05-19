@@ -14,7 +14,7 @@ class ChatHistory:
         except Exception as e:
             print(f"Error adding to vector memory: {str(e)}")
 
-    def get_history(self, max_messages=50):
+    def get_history(self, max_messages=10):
         recent_messages = self.session_history[-max_messages:] if max_messages > 0 else self.session_history
         
         history_str = ""
@@ -23,7 +23,7 @@ class ChatHistory:
         
         return history_str
     
-    def get_relevant_context(self, query, k=5) -> dict:
+    def get_relevant_context(self, query, k=3) -> dict:
         try:
             return self.vector_memory.get_relevant_context(query, k)
         except Exception as e:

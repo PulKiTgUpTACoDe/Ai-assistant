@@ -8,10 +8,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from typing import Optional, Literal
-import pytz
 import subprocess
 
-now = datetime.now(pytz.timezone("Asia/Kolkata")) + timedelta(minutes=1)
+now = datetime.now() + timedelta(minutes=1)
 
 llm = ChatGoogleGenerativeAI(
     api_key=os.getenv("GOOGLE_API_KEY"), 
@@ -46,6 +45,10 @@ def whatsapp_automation_app(recipient: str, message: str) -> dict:
         time.sleep(1)
         pg.press('enter')
         time.sleep(5)
+
+        pg.press('esc',2,0.2)
+        pg.hotkey('ctrl','a')
+        pg.press('backspace')
 
         pg.write(recipient)
         time.sleep(2)
@@ -151,7 +154,6 @@ def get_message_for_whatsapp(query: str) -> dict:
     try:
         result = llm_with_tools.invoke(messages)
 
-        # If it returns tool calls, run them
         if hasattr(result, "tool_calls") and result.tool_calls:
             tool_responses = []
             for tool_call in result.tool_calls:

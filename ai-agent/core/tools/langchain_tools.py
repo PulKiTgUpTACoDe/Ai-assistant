@@ -132,7 +132,9 @@ def get_current_time() -> str:
 
 @tool
 def recall_context(query: str) -> dict:
-    """Recall relevant information from previous conversations when user refers to past discussions. Use phrases like 'remember when', 'as we discussed', etc."""
+    """Recall relevant information from previous conversations when user refers to past discussions. Use phrases like 'remember when', 'as we discussed', etc. Whenever you feel that the user might be taking past conversation as its current referrence the use this tool.
+    Use your reasoning to know when could a user refer past conversation and call this tool"""
+    
     from core.memory.chat_history import ChatHistory
     chat_history_manager = ChatHistory()
     return chat_history_manager.get_relevant_context(query, k=3)
@@ -232,8 +234,8 @@ def exit():
     try:
         import sys
         from core.memory import chat_history
-        chat_history_manager = chat_history.ChatHistory(session_only=True)
-        chat_history_manager.end_session()
+        # chat_history_manager = chat_history.ChatHistory(session_only=True)
+        # chat_history_manager.end_session()
         sys.exit()
     except Exception as e:
         return {"result": f"Exit failed: {str(e)}"}
