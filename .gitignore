@@ -21,6 +21,7 @@ ai-agent/core/agents/__pycache__/
 ai-agent/core/memory/__pycache__/
 ai-agent/core/utils/__pycache__/
 ai-agent/tests/
+ai-agent/public/
 yolov8m.pt
 yolov8s.pt
 captured_frame_for_analysis.jpg
