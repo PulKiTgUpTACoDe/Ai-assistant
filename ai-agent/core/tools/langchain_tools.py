@@ -13,6 +13,7 @@ from langchain_community.utilities import (
     WolframAlphaAPIWrapper,
     WikipediaAPIWrapper,
 )
+from .image_generation import generate_image
 
 load_dotenv()
 
@@ -132,7 +133,9 @@ def get_current_time() -> str:
 
 @tool
 def recall_context(query: str) -> dict:
-    """Recall relevant information from previous conversations when user refers to past discussions. Use phrases like 'remember when', 'as we discussed', etc."""
+    """Recall relevant information from previous conversations when user refers to past discussions. Use phrases like 'remember when', 'as we discussed', etc. Whenever you feel that the user might be taking past conversation as its current referrence the use this tool.
+    Use your reasoning to know when could a user refer past conversation and call this tool"""
+    
     from core.memory.chat_history import ChatHistory
     chat_history_manager = ChatHistory()
     return chat_history_manager.get_relevant_context(query, k=3)
@@ -232,14 +235,74 @@ def exit():
     try:
         import sys
         from core.memory import chat_history
-        chat_history_manager = chat_history.ChatHistory(session_only=True)
-        chat_history_manager.end_session()
+        # chat_history_manager = chat_history.ChatHistory(session_only=True)
+        # chat_history_manager.end_session()
         sys.exit()
     except Exception as e:
         return {"result": f"Exit failed: {str(e)}"}
 
+@tool
+def image_generation(prompt: str, name: str, output_format: str = "jpeg", negative_prompt: str = None, aspect_ratio: str = None, mode: str = "text-to-image", seed: int = None, strength: float = None, image: str = None, **kwargs) -> dict:
+    """
+    Generates an image from a text prompt using the Stability API with full control over all parameters. The AI can decide positive/negative prompts, aspect ratio, mode, seed, strength, and more. Decide all the input values for yourself or use default values until user dosen't specifies it explicitly. Don't ask again and again if user is not specifying.
+    Args:
+        prompt: Positive prompt for the image.
+        name: Name for the generated image file, Decide it yourself according to the content of the image.
+        output_format: Output format (jpeg, png, etc). Use default format until user describes.
+        negative_prompt: What you do NOT want in the image. Decide it yourself until user dosen't specifies it or leave it.
+        aspect_ratio: Aspect ratio (e.g., '16:9', '1:1', etc.) Decide it yourself based on the query.
+        mode: 'text-to-image' or 'image-to-image'.
+        seed: Random seed for reproducibility.
+        strength: Denoising strength (for image-to-image).
+        image: Base64-encoded image for image-to-image mode.
+        **kwargs: Any additional API parameters.
+
+        Returns:
+            Path to the saved image file.
+    """
+
+    try:
+        image_path = generate_image(
+            prompt=prompt,
+            name=name,
+            output_format=output_format,
+            negative_prompt=negative_prompt,
+            aspect_ratio=aspect_ratio,
+            mode=mode,
+            seed=seed,
+            strength=strength,
+            image=image,
+            **kwargs
+        )
+        return {"result": f"Image generated and saved to {image_path}"}
+    except Exception as e:
+        return {"error": str(e)}
+
+@tool
+def get_base64_image_from_public(filename: str) -> str:
+    """
+    Reads an image from ai-agent/public and returns its base64-encoded string.
+    Use this tool when the user is asking to generate image using another image or its base-64 string.
+    Use the output of this tool as the input of image_generation tool to use image to image generation
+
+    Args:
+        filename: The name of the image file.
+    Returns:
+        Base64-encoded string of the image.
+    """
+    import base64
+    import os
+
+    try:
+        path = os.path.join("ai-agent", "public", filename)
+        with open(path, "rb") as img_file:
+            return {"result": f"Base64-encoded image is {base64.b64encode(img_file.read()).decode("utf-8")}"}
+        
+    except Exception as e:
+        return {"error": str(e)}
+
 tools = [
     open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context, send_whatsApp_message,
     screenshot, weather, object_detection_visual, image_recognition, shutdown, restart,
-    set_volume, increase_volume, decrease_volume, exit
+    set_volume, increase_volume, decrease_volume, exit, image_generation, get_base64_image_from_public
 ]

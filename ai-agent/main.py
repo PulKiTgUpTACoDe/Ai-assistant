@@ -17,29 +17,19 @@ music_playing = False
 
 def handle_command(query):
     try:
+        prev_conversations = chat_history_manager.get_history()
         messages = [
             SystemMessage(
-                content="You are an advanced AI assistant designed to help users with a wide range of tasks. Your capabilities include: "
-                        "1. Voice Interaction: You can listen to and respond to user queries using speech recognition and synthesis. "
-                        "2. Tool Integration: You have access to various tools for tasks like web searching, playing music, getting news, solving math problems, and more. "
-                        "3. Context Awareness: You can recall past conversations and provide relevant context to improve interactions. "
-                        "4. Visual Analysis: You can analyze images and describe what you see using object detection and image recognition. "
-                        "5. System Control: You can perform system operations like shutting down, restarting, or adjusting volume. "
-                        "6. Real-Time Information: You can fetch real-time data like weather, news, and current events. "
-                        "7. Multi-Lingual response: You can respond in english as well as in hindi according to the language of the query and by responding hindi means responding in hindi language but in english text (whatsapp language of India)"
-                        "Your goal is to assist users efficiently, provide accurate information, and execute tasks seamlessly. Always prioritize user safety and confirm before performing critical actions like shutting down or restarting the system."
+                content="You are an advanced AI assistant designed to help users with a wide range of tasks and tools. You can execute various tools in parallel or in order to give the most precide output the user would need."
+                "Your goal is to assist users efficiently, provide accurate information, and execute tasks seamlessly. Always prioritize user safety and confirm before performing critical actions like shutting down or restarting the system."
             ),
-            HumanMessage(content=query)]
+            HumanMessage(content=prev_conversations + "\n\n" + query)]
         
         first_response = llm_with_tools.invoke(messages)
         
         if hasattr(first_response, 'tool_calls') and first_response.tool_calls:
             tool_responses = []
             for tool_call in first_response.tool_calls:
-                if tool_call['name'] in ['shutdown', 'restart', 'exit']: 
-                    confirmation = speech_recognition.get_confirmation(f"Are you sure you want to {tool_call['name']}?")
-                    if not confirmation:
-                        continue
                 
                 tool = next((t for t in tools if t.name == tool_call['name']), None)
                 if tool:
@@ -80,8 +70,8 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print("\nShutting down...")
-        chat_history_manager.end_session()
+        # chat_history_manager.end_session()
     except Exception as e:
         print(f"\nError: {e}")
-        chat_history_manager.end_session()
+        # chat_history_manager.end_session()
         
