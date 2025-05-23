@@ -3,7 +3,7 @@ import datetime
 import time
 import pyautogui
 from dotenv import load_dotenv
-from typing import Any, Optional
+from typing import Any, Optional, List
 from .news_api import NewsAPIWrapper
 from .object_detection import analyze_visual_input
 from .image_recognition import analyze_image
@@ -14,6 +14,7 @@ from langchain_community.utilities import (
     WikipediaAPIWrapper,
 )
 from .image_generation import generate_image
+from .document_reader import answer_question, ingest_documents, load_documents_from_folder
 
 load_dotenv()
 
@@ -301,8 +302,18 @@ def get_base64_image_from_public(filename: str) -> str:
     except Exception as e:
         return {"error": str(e)}
 
+@tool
+def ask_document_question(question: str) -> dict:
+    """Answers a question by searching all ingested documents (PDFs, text files) using RAG and Gemini LLM. Returns a synthesized answer with sources."""
+
+    try:
+        answer = answer_question(question)
+        return {"result": answer}
+    except Exception as e:
+        return {"error": str(e)}
+
 tools = [
     open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context, send_whatsApp_message,
     screenshot, weather, object_detection_visual, image_recognition, shutdown, restart,
-    set_volume, increase_volume, decrease_volume, exit, image_generation, get_base64_image_from_public
+    set_volume, increase_volume, decrease_volume, exit, image_generation, get_base64_image_from_public, ask_document_question,
 ]

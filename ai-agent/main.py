@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 load_dotenv()
 
 # Get methods
-from core.tools import speech_recognition, speech_synthesis
+from core.tools import speech_recognition, speech_synthesis, document_reader
 from core.memory import chat_history
 from core.agents.langchain_agent import llm_with_tools, llm
 from core.agents.langchain_agent import tools
@@ -58,7 +58,12 @@ if __name__ == '__main__':
 
     # Start speech processing thread
     speech_thread = threading.Thread(target=speech_synthesis.process_speech_queue, daemon=True)
+
+    # Ingest all the documents in the vector memory
+    ingest_document_thread = threading.Thread(target=document_reader.ingest_documents("ai-agent/public/documents"), daemon=True)
+
     speech_thread.start()
+    ingest_document_thread.start()
 
     try:
         while True:
