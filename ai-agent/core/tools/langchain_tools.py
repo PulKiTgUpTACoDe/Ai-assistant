@@ -8,6 +8,7 @@ from .news_api import NewsAPIWrapper
 from .object_detection import analyze_visual_input
 from .image_recognition import analyze_image
 from .whatsapp_automation import get_message_for_whatsapp
+from .ai_scraper import scrape_webpage
 from langchain_community.utilities import (
     SerpAPIWrapper,
     WolframAlphaAPIWrapper,
@@ -312,8 +313,44 @@ def ask_document_question(question: str) -> dict:
     except Exception as e:
         return {"error": str(e)}
 
+@tool
+def scrape_website(url: str, task: str = "extract all content") -> dict:
+    """Scrapes content from a website using browser automation and AI-powered content extraction.
+    
+    This tool uses a headless browser to access websites and an AI model to intelligently extract
+    relevant content based on the specified task. It can handle dynamic content, JavaScript-rendered
+    pages, and complex web structures.
+    
+    Args:
+        url (str): The complete URL of the website to scrape (must include http:// or https://)
+        task (str, optional): Specific instructions for what content to extract. Examples:
+            - "extract all content" (default)
+            - "get product prices and descriptions"
+            - "find all article headlines"
+            - "extract contact information"
+            - "get all image URLs"
+    
+    Returns:
+        dict: A dictionary containing:
+            - On success: {"result": "The scraped content as a string"}
+            - On failure: {"error": "Error message describing what went wrong"}
+    
+    Note:
+        - The tool uses browser automation, so it can handle modern websites with JavaScript
+        - Content extraction is AI-powered, allowing for intelligent parsing of complex pages
+        - Rate limiting and website policies are respected
+        - Some websites may block automated access
+    """
+    
+    import asyncio
+    try:
+        result = asyncio.run(scrape_webpage(url, task))
+        return {"result": result}
+    except Exception as e:
+        return {"error": str(e)}
+
 tools = [
-    open_app, google_search, wikipedia, math_calc,play_music, stop_music, get_current_time, get_news, recall_context, send_whatsApp_message,
+    open_app, google_search, wikipedia, math_calc, play_music, stop_music, get_current_time, get_news, recall_context, send_whatsApp_message,
     screenshot, weather, object_detection_visual, image_recognition, shutdown, restart,
-    set_volume, increase_volume, decrease_volume, exit, image_generation, get_base64_image_from_public, ask_document_question,
+    set_volume, increase_volume, decrease_volume, exit, image_generation, get_base64_image_from_public, ask_document_question, scrape_website,
 ]
