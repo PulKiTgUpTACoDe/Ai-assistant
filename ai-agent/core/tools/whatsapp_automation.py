@@ -41,7 +41,7 @@ def whatsapp_automation_app(recipient: str, message: str) -> dict:
     try:
         pg.press('win')
         time.sleep(1)
-        pg.write('whatsapp')
+        pg.write('whatsap')
         time.sleep(1)
         pg.press('enter')
         time.sleep(5)

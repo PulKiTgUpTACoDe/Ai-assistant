@@ -8,7 +8,7 @@ from .news_api import NewsAPIWrapper
 from .object_detection import analyze_visual_input
 from .image_recognition import analyze_image
 from .whatsapp_automation import get_message_for_whatsapp
-from .ai_scraper import scrape_webpage
+from .ai_scraper import web_automation_task
 from langchain_community.utilities import (
     SerpAPIWrapper,
     WolframAlphaAPIWrapper,
@@ -63,7 +63,7 @@ def math_calc(query: str) -> dict:
 @tool
 def send_whatsApp_message(query: str) -> dict:
     """Sends a message on whatsapp on the users request or if necessary
-    The query would contain atleast the recipient's name/phone number to which the message is to be sent and the message content that has to be sent.
+    The query would contain atleast the recipient's name or phone number to which the message is to be sent and the message content that has to be sent.
     """
 
     return get_message_for_whatsapp(query)
@@ -314,37 +314,47 @@ def ask_document_question(question: str) -> dict:
         return {"error": str(e)}
 
 @tool
-def scrape_website(url: str, task: str = "extract all content") -> dict:
-    """Scrapes content from a website using browser automation and AI-powered content extraction.
+def web_automation(url: Optional[str], task: str = "extract all content") -> dict:
+    """Performs web automation tasks using browser automation and AI-powered interaction.
     
-    This tool uses a headless browser to access websites and an AI model to intelligently extract
-    relevant content based on the specified task. It can handle dynamic content, JavaScript-rendered
-    pages, and complex web structures.
+    This tool uses a headless browser to interact with websites and can perform various tasks including:
+    - Web scraping and content extraction
+    - Form filling and submission
+    - Clicking buttons and navigating pages
+    - Extracting specific data (prices, contact info, etc.)
+    - Interacting with dynamic web applications
+    - Taking screenshots of web pages
+    - Executing JavaScript
+    - Handling authentication and sessions
     
     Args:
-        url (str): The complete URL of the website to scrape (must include http:// or https://)
-        task (str, optional): Specific instructions for what content to extract. Examples:
+        url (Optional[str]): The complete URL of the website to interact with (must include http:// or https://)
+        task (str, optional): Specific instructions for what action to perform. Examples:
             - "extract all content" (default)
-            - "get product prices and descriptions"
-            - "find all article headlines"
-            - "extract contact information"
-            - "get all image URLs"
+            - "fill out the contact form with name: John, email: john@example.com"
+            - "click the login button and enter credentials"
+            - "find and click all 'Add to Cart' buttons"
+            - "take a screenshot of the page"
+            - "extract all product prices and descriptions"
+            - "navigate to the about page and get team information"
+            - "execute JavaScript to scroll to bottom of page"
     
     Returns:
         dict: A dictionary containing:
-            - On success: {"result": "The scraped content as a string"}
+            - On success: {"result": "The result of the web automation task"}
             - On failure: {"error": "Error message describing what went wrong"}
     
     Note:
         - The tool uses browser automation, so it can handle modern websites with JavaScript
-        - Content extraction is AI-powered, allowing for intelligent parsing of complex pages
+        - Actions are AI-powered, allowing for intelligent interaction with complex pages
         - Rate limiting and website policies are respected
         - Some websites may block automated access
+        - The tool can maintain session state and handle cookies
     """
     
     import asyncio
     try:
-        result = asyncio.run(scrape_webpage(url, task))
+        result = asyncio.run(web_automation_task(url, task))
         return {"result": result}
     except Exception as e:
         return {"error": str(e)}
@@ -352,5 +362,5 @@ def scrape_website(url: str, task: str = "extract all content") -> dict:
 tools = [
     open_app, google_search, wikipedia, math_calc, play_music, stop_music, get_current_time, get_news, recall_context, send_whatsApp_message,
     screenshot, weather, object_detection_visual, image_recognition, shutdown, restart,
-    set_volume, increase_volume, decrease_volume, exit, image_generation, get_base64_image_from_public, ask_document_question, scrape_website,
+    set_volume, increase_volume, decrease_volume, exit, image_generation, get_base64_image_from_public, ask_document_question, web_automation,
 ]

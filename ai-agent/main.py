@@ -53,17 +53,19 @@ def handle_command(query):
         speech_synthesis.say("Sorry, I encountered an error processing that request.")
         print(f"[Agent Error] {e}")
 
-if __name__ == '__main__':
-    speech_synthesis.say('\nWelcome to AI Assistant')
-
-    # Start speech processing thread
+def initialize_background_tasks():
     speech_thread = threading.Thread(target=speech_synthesis.process_speech_queue, daemon=True)
-
-    # Ingest all the documents in the vector memory
-    ingest_document_thread = threading.Thread(target=document_reader.ingest_documents("ai-agent/public/documents"), daemon=True)
-
     speech_thread.start()
-    ingest_document_thread.start()
+    
+    # Start document ingestion in background
+    ingest_thread = threading.Thread(target=lambda: document_reader.ingest_documents("ai-agent/public/documents"), daemon=True)
+    ingest_thread.start()
+
+if __name__ == '__main__':
+    initialize_background_tasks()
+    
+    speech_synthesis.say('\nWelcome to AI Assistant')
+    print("\nListening...")
 
     try:
         while True:
@@ -71,12 +73,9 @@ if __name__ == '__main__':
             if query:
                 speech_synthesis.control_queue.put_nowait("stop")
                 handle_command(query)
-            pass
 
     except KeyboardInterrupt:
         print("\nShutting down...")
-        # chat_history_manager.end_session()
     except Exception as e:
         print(f"\nError: {e}")
-        # chat_history_manager.end_session()
         

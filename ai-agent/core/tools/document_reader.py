@@ -36,10 +36,10 @@ def load_documents_from_folder(folder_path: str) -> List[Document]:
             try:
                 if fname.lower().endswith('.pdf'):
                     loader = PyPDFLoader(fpath)
-                    docs.extend(fname, loader.load())
+                    docs.extend(loader.load())
                 elif fname.lower().endswith('.txt'):
                     loader = TextLoader(fpath, autodetect_encoding=True)
-                    docs.extend(fname, loader.load())
+                    docs.extend(loader.load())
             except Exception as e:
                 print(f"Error loading file {fname}: {e}")
     except Exception as e:
