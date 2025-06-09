@@ -1,153 +1,220 @@
 # AI Voice Agent
+
 ![image](https://github.com/user-attachments/assets/aadac9d8-d439-4d24-bd35-ce85552b4835)
 
-A Python-based AI voice agent that can perform various tasks using voice commands and natural language processing.
+A powerful Python-based AI voice agent that combines natural language processing, computer vision, and various tools to provide an intelligent voice assistant experience.
 
-## Features
+## 🌟 Key Features
 
-- **Voice Recognition & Speech Synthesis**: Real-time voice input and output.
-- **Natural Language Processing**: Powered by Google Gemini AI for advanced language understanding.
-- **Object Detection**: Real-time object detection using YOLOv8 and contextual analysis with Gemini Vision Pro.
-- **System Control**: Commands for shutdown, restart, volume control, and application management.
-- **Web Search**: Google search integration using Serper API.
-- **Music Playback**: Plays music from YouTube using `yt_dlp` and `vlc`.
-- **Weather Information**: Fetches weather data using WeatherAPI.
-- **News Retrieval**: Fetches the latest news using NewsAPI.
-- **Math Calculations**: Complex math and science queries using Wolfram Alpha.
-- **Wikipedia Search**: Provides information from Wikipedia using the Wikipedia API.
-- **Screenshot Capture**: Captures and saves screenshots using `pyautogui`.
-- **Chat History Management**: Stores conversation history using ChromaDB for vector-based memory.
+### Voice & Speech
 
-## Prerequisites
+- Real-time voice recognition and speech synthesis
+- Natural conversation flow with context awareness
+- Multi-language support
+
+### AI & Machine Learning
+
+- Powered by Google Gemini AI for advanced language understanding
+- Real-time object detection using YOLOv8
+- Contextual image analysis with Gemini Vision Pro
+- Vector-based memory using ChromaDB
+
+### System Integration
+
+- System control commands (shutdown, restart, volume)
+- Application management
+- Screenshot capture and analysis
+- File system operations
+
+### Information & Media
+
+- Web search integration using Serper API
+- YouTube music playback
+- Weather information via WeatherAPI
+- Latest news retrieval using NewsAPI
+- Wikipedia knowledge base access
+- Math calculations using Wolfram Alpha
+
+### Automation & Tools
+
+- WhatsApp automation
+- Document reading and analysis
+- Web scraping capabilities
+- Image generation and recognition
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 - Python 3.8 or higher
 - Windows OS (for system commands)
 - Internet connection
 - Microphone and speakers
+- Git
 
-## Installation
+### Step-by-Step Installation
 
-1. Clone the repository:
+1. **Clone the Repository**
 
-```bash
-git clone https://github.com/yourusername/ai-voice-assistant.git
-cd ai-voice-assistant
-```
+   ```bash
+   git clone https://github.com/yourusername/ai-voice-assistant.git
+   cd ai-voice-assistant
+   ```
 
-2. Create and activate a virtual environment:
+2. **Set Up Virtual Environment**
 
-```bash
-python -m venv .mlvenv
-# On Windows
-.mlvenv\Scripts\activate
-# On Unix or MacOS
-source .mlvenv/bin/activate
-```
+   ```bash
+   # Create virtual environment
+   python -m venv .mlvenv
 
-3. Install required packages:
+   # Activate virtual environment
+   # On Windows
+   .mlvenv\Scripts\activate
+   # On Unix or MacOS
+   source .mlvenv/bin/activate
+   ```
 
-```bash
-pip install -r requirements.txt
-```
+3. **Install Dependencies**
 
-4. Create a `.env` file in the project root:
+   ```bash
+   # Upgrade pip
+   python -m pip install --upgrade pip
 
-```bash
-cp .env.example .env
-```
+   # Install requirements
+   pip install -r requirements.txt
+   ```
 
-5. Add your API keys to the `.env` file:
+4. **Configure Environment Variables**
 
+   ```bash
+   # Copy example environment file
+   cp .env.example .env
+   ```
 
-```
-GOOGLE_API_KEY=your_gemini_api_key
-WEATHER_API_KEY=your_weather_api_key
-PICOVOICE_ACCESS_KEY=api_key
-SERPAPI_API_KEY=api_key
-WOLFRAM_ALPHA_APPID=api_id
+5. **Set Up API Keys**
+   Edit the `.env` file and add your API keys:
 
-# GOOGLE_CSE_ID=client_id
+   ```
+   # AI Services
+   GOOGLE_API_KEY=your_gemini_api_key
 
-# Ask news credenials
-asknews_client_secret='secret'
-asknews_client_id='client_id'
+   # Weather and News
+   WEATHER_API_KEY=your_weather_api_key
+   NEWS_API_KEY=your_news_api_key
 
-# Configuration
-DEBUG=True
-LOG_LEVEL=INFO
+   # Search and Knowledge
+   SERPAPI_API_KEY=your_serpapi_key
+   WOLFRAM_ALPHA_APPID=your_wolfram_key
 
-# Database
-VECTOR_DB_PATH=ai-agent/database
+   # Voice Services
+   PICOVOICE_ACCESS_KEY=your_picovoice_key
 
-# Services
-API_HOST=0.0.0.0
-API_PORT=8000
-WEBSOCKET_PORT=8001
+   # News API Credentials
+   asknews_client_secret='your_secret'
+   asknews_client_id='your_client_id'
 
-# Langsmith congif
-LANGSMITH_TRACING=true
-LANGSMITH_ENDPOINT="https://api.smith.langchain.com"
-LANGSMITH_API_KEY=api_key
-LANGSMITH_PROJECT="Your project name"
-```
+   # Configuration
+   DEBUG=True
+   LOG_LEVEL=INFO
 
-## Usage
+   # Database
+   VECTOR_DB_PATH=ai-agent/database
 
-1. Run the assistant:
+   # Services
+   API_HOST=0.0.0.0
+   API_PORT=8000
+   WEBSOCKET_PORT=8001
 
-```bash
-python -m ai-agent.main
-```
+   # Langsmith Configuration
+   LANGSMITH_TRACING=true
+   LANGSMITH_ENDPOINT="https://api.smith.langchain.com"
+   LANGSMITH_API_KEY=your_langsmith_key
+   LANGSMITH_PROJECT="Your project name"
+   ```
 
-## Project Structure
+6. **Initialize the Database**
+   ```bash
+   # The database will be automatically initialized on first run
+   ```
+
+### Running the Assistant
+
+1. **Start the Assistant**
+
+   ```bash
+   python -m ai-agent.main
+   ```
+
+2. **Using Voice Commands**
+
+   - Wait for the "Listening..." prompt
+   - Speak your command clearly
+   - The assistant will respond through voice and text
+
+3. **Example Commands**
+   - "What's the weather like today?"
+   - "Play some music from YouTube"
+   - "Take a screenshot and analyze it"
+   - "Search Wikipedia for artificial intelligence"
+   - "What's the latest news?"
+
+## 📁 Project Structure
 
 ```
 ai-agent/
-│── config/             # Configuration files (YAML/JSON)
-│── core/                    # Core logic
-│   ├── agents/              # AI Agents (LLM, RAG, etc.)
-│   ├── memory/              # Context storage (ChromaDB, Pinecone, etc.)
-│   ├── retrieval/           # Information retrieval (RAG-based)
-│   ├── tools/               # External API tools (Google, Wolfram, etc.)
-│   ├── utils/               # Helper functions (file handling, logs, etc.)
-│
-│── models/                  # Pretrained or fine-tuned ML models
-│── services/                # API services & orchestration
-│   ├── api.py               # REST API (FastAPI)
-│   ├── websocket.py         # Real-time communication
-│
-│── database/                # Long-term storage
-│   ├── chroma.sqlite3/         # Vector embeddings storage
-│
-│── web/                     # Frontend UI or chatbot UI
-│── tests/                   # Unit tests & integration tests
-│── scripts/                 # Utility scripts for automation
-│── .env                     # Environment variables
-│── requirements.txt         # Dependencies
-│── Dockerfile               # Containerization
-│── main.py                  # Entry point
+├── config/             # Configuration files
+├── core/              # Core functionality
+│   ├── agents/        # AI Agents (LLM, RAG)
+│   ├── memory/        # Context storage
+│   ├── retrieval/     # Information retrieval
+│   ├── tools/         # External API tools
+│   └── utils/         # Helper functions
+├── models/            # ML models
+├── services/          # API services
+├── database/          # Data storage
+├── web/              # Frontend UI
+├── tests/            # Test suite
+├── scripts/          # Utility scripts
+├── .env              # Environment variables
+├── requirements.txt  # Dependencies
+├── Dockerfile        # Container config
+└── main.py          # Entry point
 ```
 
-## Contributing
+## 🛠️ Development
+
+### Running Tests
+
+```bash
+pytest tests/
+```
+
+### Code Style
+
+- Follow PEP 8 guidelines
+- Use type hints
+- Document functions and classes
+
+### Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📝 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- Google Gemini AI for natural language processing
-- YOLOv8 for object detection
-- ChromaDB for vector-based memory
-- WeatherAPI for weather information
-- Serper API for web search
-- Wolfram Alpha API for math calculations
-- Wikipedia API for knowledge retrieval
-- NewsAPI for news retrieval
-- Various Python libraries used in this project
+- Google Gemini AI
+- YOLOv8
+- ChromaDB
+- WeatherAPI
+- Serper API
+- Wolfram Alpha
+- Wikipedia API
+- NewsAPI
+- All contributors and users
