@@ -15,7 +15,7 @@ chat_history_manager = chat_history.ChatHistory(session_only=True)
 music_playing = False
 
 
-def handle_command(query):
+def handle_command(query, llm_tools=llm_with_tools):
     try:
         prev_conversations = chat_history_manager.get_history()
         messages = [
@@ -25,7 +25,7 @@ def handle_command(query):
             ),
             HumanMessage(content=prev_conversations + "\n\n" + query)]
         
-        first_response = llm_with_tools.invoke(messages)
+        first_response = llm_tools.invoke(messages)
         
         if hasattr(first_response, 'tool_calls') and first_response.tool_calls:
             tool_responses = []
