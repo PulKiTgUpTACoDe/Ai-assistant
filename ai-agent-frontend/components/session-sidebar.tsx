@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSession } from "@/lib/context/session-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, Edit2, Check, X } from "lucide-react";
+import { Plus, Trash2, Edit2, Check, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 
@@ -21,9 +21,17 @@ export function SessionSidebar() {
 
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const handleCreateSession = async () => {
-    await createSession("New Chat");
+    try {
+      setIsCreating(true);
+      await createSession("New Chat");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleRenameStart = (session: any) => {
@@ -33,13 +41,27 @@ export function SessionSidebar() {
 
   const handleRenameSave = async () => {
     if (editingSessionId && newTitle.trim()) {
-      await renameSession(editingSessionId, newTitle.trim());
-      setEditingSessionId(null);
+      try {
+        setIsRenaming(true);
+        await renameSession(editingSessionId, newTitle.trim());
+        setEditingSessionId(null);
+      } finally {
+        setIsRenaming(false);
+      }
     }
   };
 
   const handleRenameCancel = () => {
     setEditingSessionId(null);
+  };
+
+  const handleDelete = async (sessionId: string) => {
+    try {
+      setIsDeleting(sessionId);
+      await deleteSession(sessionId);
+    } finally {
+      setIsDeleting(null);
+    }
   };
 
   return (
@@ -48,9 +70,13 @@ export function SessionSidebar() {
         <Button
           onClick={handleCreateSession}
           className="w-full"
-          disabled={isLoading}
+          disabled={isLoading || isCreating}
         >
-          <Plus className="w-4 h-4 mr-2" />
+          {isCreating ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Plus className="w-4 h-4 mr-2" />
+          )}
           New Chat
         </Button>
       </div>
@@ -79,20 +105,27 @@ export function SessionSidebar() {
                       onChange={(e) => setNewTitle(e.target.value)}
                       className="h-8"
                       autoFocus
+                      disabled={isRenaming}
                     />
                     <Button
                       size="icon"
                       variant="ghost"
                       onClick={handleRenameSave}
                       className="h-8 w-8"
+                      disabled={isRenaming}
                     >
-                      <Check className="h-4 w-4" />
+                      {isRenaming ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Check className="h-4 w-4" />
+                      )}
                     </Button>
                     <Button
                       size="icon"
                       variant="ghost"
                       onClick={handleRenameCancel}
                       className="h-8 w-8"
+                      disabled={isRenaming}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -111,16 +144,22 @@ export function SessionSidebar() {
                         variant="ghost"
                         onClick={() => handleRenameStart(session)}
                         className="h-8 w-8"
+                        disabled={isDeleting === session.id}
                       >
                         <Edit2 className="h-4 w-4" />
                       </Button>
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={() => deleteSession(session.id)}
+                        onClick={() => handleDelete(session.id)}
                         className="h-8 w-8"
+                        disabled={isDeleting === session.id}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        {isDeleting === session.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </>

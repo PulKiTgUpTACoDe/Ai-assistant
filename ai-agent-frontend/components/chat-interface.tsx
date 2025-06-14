@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Bot } from "lucide-react";
@@ -93,7 +93,6 @@ export function ChatInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
   const [currentResponse, setCurrentResponse] = useState<string>("");
-  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -124,7 +123,6 @@ export function ChatInterface() {
     setInput("");
     setIsLoading(true);
     setCurrentResponse("");
-    setIsAnimating(true);
 
     try {
       // Add user message
@@ -169,7 +167,6 @@ export function ChatInterface() {
         error instanceof Error ? error.message : "Failed to send message"
       );
       console.error("Chat error:", error);
-      setIsAnimating(false);
       setIsLoading(false);
     }
   };
@@ -188,9 +185,9 @@ export function ChatInterface() {
 
   return (
     <div className="flex flex-col h-full w-full bg-background relative left-20">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 w-full pb-30">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 w-5xl min-w-2xl pb-30">
         {!messages || messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4 w-full">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4 w-full pl-28">
             <Bot className="w-12 h-12 text-primary/50" />
             <p className="text-lg text-muted-foreground max-w-2xl">
               {isSignedIn
@@ -199,7 +196,7 @@ export function ChatInterface() {
             </p>
           </div>
         ) : (
-          <div className="w-full max-w-4xl mx-auto">
+          <div className="w-full min-w-4xl mx-auto">
             {messages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
@@ -229,7 +226,6 @@ export function ChatInterface() {
                   }
 
                   setCurrentResponse("");
-                  setIsAnimating(false);
                   setIsLoading(false);
                 }}
               />
