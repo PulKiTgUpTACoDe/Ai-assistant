@@ -29,6 +29,7 @@ class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
     user_id: Optional[str] = None
+    context: Optional[List[dict]] = None
 
 class ChatResponse(BaseModel):
     response: str
@@ -36,13 +37,25 @@ class ChatResponse(BaseModel):
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
+        # Start with system message
         messages = [
             SystemMessage(
                 content="You are an advanced AI assistant designed to help users with a wide range of tasks and tools. You can execute various tools in parallel or in order to give the most precise output the user would need."
+                "I want you to not use asterisks signs in your answers strictly"
                 "Your goal is to assist users efficiently, provide accurate information, and execute tasks seamlessly. Always prioritize user safety and confirm before performing critical actions like shutting down or restarting the system."
-            ),
-            HumanMessage(content=request.message)
+            )
         ]
+
+        # Add context messages if available
+        if request.context:
+            for msg in request.context:
+                if msg["role"] == "user":
+                    messages.append(HumanMessage(content=msg["content"]))
+                elif msg["role"] == "assistant":
+                    messages.append(ToolMessage(content=msg["content"]))
+        
+        # Add current message
+        messages.append(HumanMessage(content=request.message))
         
         first_response = llm_with_web_tools.invoke(messages)
         

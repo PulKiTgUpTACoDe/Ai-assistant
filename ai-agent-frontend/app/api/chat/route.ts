@@ -2,14 +2,41 @@
 
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import { prisma } from "@/lib/prisma";
+
+interface Message {
+    role: string;
+    content: string;
+}
 
 export async function POST(req: Request) {
     try {
-        const { message, sessionId } = await req.json();
         const session = await auth();
+        if (!session?.userId) {
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
 
-        // Forward the request to the Python backend
-        const response = await fetch("http://localhost:8000/api/chat", {
+        const { message, sessionId } = await req.json();
+
+        if (!message) {
+            return new NextResponse("Message is required", { status: 400 });
+        }
+
+        // If sessionId is provided, fetch previous messages for context
+        let previousMessages: Message[] = [];
+        if (sessionId) {
+            previousMessages = await prisma.message.findMany({
+                where: {
+                    sessionId: sessionId,
+                },
+                orderBy: {
+                    createdAt: 'asc',
+                },
+            });
+        }
+
+        // Forward the request to the Python backend with context
+        const response = await fetch(`${process.env.WEB_URL}/api/chat`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -17,7 +44,8 @@ export async function POST(req: Request) {
             body: JSON.stringify({
                 message,
                 session_id: sessionId,
-                user_id: session?.userId || null
+                user_id: session?.userId || null,
+                context: previousMessages
             }),
         });
 

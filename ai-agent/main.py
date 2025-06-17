@@ -21,6 +21,7 @@ def handle_command(query, llm_tools=llm_with_tools):
         messages = [
             SystemMessage(
                 content="You are an advanced AI assistant designed to help users with a wide range of tasks and tools. You can execute various tools in parallel or in order to give the most precide output the user would need."
+                "I want you to not use asterisks signs in your answers"
                 "Your goal is to assist users efficiently, provide accurate information, and execute tasks seamlessly. Always prioritize user safety and confirm before performing critical actions like shutting down or restarting the system."
             ),
             HumanMessage(content=prev_conversations + "\n\n" + query)]
