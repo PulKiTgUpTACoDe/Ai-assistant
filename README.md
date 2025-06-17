@@ -11,6 +11,7 @@ A powerful Python-based AI voice agent that combines natural language processing
 - Real-time voice recognition and speech synthesis
 - Natural conversation flow with context awareness
 - Multi-language support
+- Background speech processing queue
 
 ### AI & Machine Learning
 
@@ -18,6 +19,7 @@ A powerful Python-based AI voice agent that combines natural language processing
 - Real-time object detection using YOLOv8
 - Contextual image analysis with Gemini Vision Pro
 - Vector-based memory using ChromaDB
+- Document ingestion and analysis
 
 ### System Integration
 
@@ -25,6 +27,7 @@ A powerful Python-based AI voice agent that combines natural language processing
 - Application management
 - Screenshot capture and analysis
 - File system operations
+- Background task management
 
 ### Information & Media
 
@@ -41,6 +44,7 @@ A powerful Python-based AI voice agent that combines natural language processing
 - Document reading and analysis
 - Web scraping capabilities
 - Image generation and recognition
+- Real-time WebSocket communication
 
 ## 🚀 Getting Started
 
@@ -123,7 +127,6 @@ A powerful Python-based AI voice agent that combines natural language processing
    # Services
    API_HOST=0.0.0.0
    API_PORT=8000
-   WEBSOCKET_PORT=8001
 
    # Langsmith Configuration
    LANGSMITH_TRACING=true
@@ -175,6 +178,8 @@ ai-agent/
 ├── web/              # Frontend UI
 ├── tests/            # Test suite
 ├── scripts/          # Utility scripts
+├── public/           # Public assets
+│   └── documents/    # Document storage
 ├── .env              # Environment variables
 ├── requirements.txt  # Dependencies
 ├── Dockerfile        # Container config
