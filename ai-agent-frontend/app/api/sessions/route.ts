@@ -77,7 +77,13 @@ export async function POST(req: Request) {
 
         // If firstMessage is provided, use it to generate the title
         const sessionTitle = firstMessage
-            ? firstMessage.slice(0, 50) + (firstMessage.length > 50 ? "..." : "")
+            ? firstMessage
+                .trim()
+                .replace(/[^\w\s]/g, '') 
+                .split(/\s+/)
+                .slice(0, 5) 
+                .join(' ')
+                .slice(0, 40) + (firstMessage.length > 40 ? "..." : "")
             : title || "New Chat";
 
         const newSession = await prisma.session.create({
