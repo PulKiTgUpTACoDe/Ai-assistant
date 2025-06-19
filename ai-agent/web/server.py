@@ -4,15 +4,12 @@ from pydantic import BaseModel
 from typing import Optional, List
 import sys
 import os
-from datetime import datetime, timedelta
 
 # Add the parent directory to Python path to import from ai-agent
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.agents.langchain_agent import llm, llm_with_web_tools
-from core.tools.web_tools import web_tools
+from core.agents.langchain_agent import langgraph_web_agent
 
-from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 
 app = FastAPI()
 
@@ -39,45 +36,26 @@ async def chat(request: ChatRequest):
     try:
         # Start with system message
         messages = [
-            SystemMessage(
-                content="You are an advanced AI assistant designed to help users with a wide range of tasks and tools. You can execute various tools in parallel or in order to give the most precise output the user would need."
-                "I want you to not use asterisks signs in your answers strictly"
-                "Your goal is to assist users efficiently, provide accurate information, and execute tasks seamlessly. Always prioritize user safety and confirm before performing critical actions like shutting down or restarting the system."
-            )
+            ("system", "You are an advanced AI assistant designed to help users with a wide range of tasks and tools. You can execute various tools in parallel or in order to give the most precise output the user would need."
+            "I want you to not use asterisks signs in your answers strictly"
+            "Your goal is to assist users efficiently, provide accurate information, and execute tasks seamlessly. Always prioritize user safety and confirm before performing critical actions like shutting down or restarting the system.")
         ]
-
         # Add context messages if available
         if request.context:
             for msg in request.context:
                 if msg["role"] == "user":
-                    messages.append(HumanMessage(content=msg["content"]))
+                    messages.append(("user", msg["content"]))
                 elif msg["role"] == "assistant":
-                    messages.append(ToolMessage(content=msg["content"]))
-        
+                    messages.append(("tool", msg["content"]))
         # Add current message
-        messages.append(HumanMessage(content=request.message))
+        messages.append(("user", request.message))
         
-        first_response = llm_with_web_tools.invoke(messages)
-        
-        if hasattr(first_response, 'tool_calls') and first_response.tool_calls:
-            tool_responses = []
-            for tool_call in first_response.tool_calls:
-                tool = next((t for t in web_tools if t.name == tool_call['name']), None)
-                if tool:
-                    result = tool.invoke(tool_call['args'])
-                    tool_responses.append(ToolMessage(
-                        content=str(result['result']),
-                        tool_call_id=tool_call['id']
-                    ))
-            
-            # Generate final response after all tool calls
-            if tool_responses:
-                final_response = llm.invoke(messages + [first_response] + tool_responses)
-                return ChatResponse(response=final_response.content)
-            return ChatResponse(response=first_response.content)
-        else:
-            return ChatResponse(response=first_response.content)
-            
+        result = langgraph_web_agent.invoke({"messages": messages})
+
+        ai_message = result["messages"][-1].content
+
+        return ChatResponse(response=ai_message)
+    
     except Exception as e:
         print(f"Error processing request: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
