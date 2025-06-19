@@ -6,10 +6,17 @@ from datetime import datetime
 import logging
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from langchain_google_genai import ChatGoogleGenerativeAI
+import os
+from dotenv import load_dotenv
+from langgraph.prebuilt import create_react_agent
+from langchain.tools import tool
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+load_dotenv()
 
 class FileSystemTools:
     
@@ -49,7 +56,7 @@ class FileSystemTools:
             raise ValueError(f"Invalid path: {e}")
 
     def read_file(self, file_path: str, encoding: str = 'utf-8') -> str:
-
+        """Read the contents of a file."""
         try:
             path = self._validate_path(file_path)
             with open(path, 'r', encoding=encoding) as f:
@@ -59,7 +66,7 @@ class FileSystemTools:
             raise
 
     def write_file(self, file_path: str, content: str, encoding: str = 'utf-8') -> None:
-
+        """Write content to a file, creating it if it doesn't exist."""
         try:
             path = self._validate_path(file_path)
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -70,7 +77,7 @@ class FileSystemTools:
             raise
 
     def delete_file(self, file_path: str) -> None:
-       
+        """Delete a file at the given path."""
         try:
             path = self._validate_path(file_path)
             if path.is_file():
@@ -82,7 +89,7 @@ class FileSystemTools:
             raise
 
     def list_directory(self, dir_path: str = '.', pattern: str = '*') -> List[Dict]:
-        
+        """List files and directories in the given directory, optionally filtered by pattern."""
         try:
             path = self._validate_path(dir_path)
             if not path.is_dir():
@@ -108,7 +115,7 @@ class FileSystemTools:
             raise
 
     def create_directory(self, dir_path: str) -> None:
-        
+        """Create a new directory at the given path."""
         try:
             path = self._validate_path(dir_path)
             path.mkdir(parents=True, exist_ok=True)
@@ -117,7 +124,7 @@ class FileSystemTools:
             raise
 
     def move_file(self, source: str, destination: str) -> None:
-        
+        """Move a file or directory from source to destination."""
         try:
             src = self._validate_path(source)
             dst = self._validate_path(destination)
@@ -127,7 +134,7 @@ class FileSystemTools:
             raise
 
     def copy_file(self, source: str, destination: str) -> None:
-        
+        """Copy a file or directory from source to destination."""
         try:
             src = self._validate_path(source)
             dst = self._validate_path(destination)
@@ -140,7 +147,7 @@ class FileSystemTools:
             raise
 
     def get_file_hash(self, file_path: str, algorithm: str = 'sha256') -> str:
-        
+        """Get the hash of a file using the specified algorithm (default: sha256)."""
         try:
             path = self._validate_path(file_path)
             if not path.is_file():
@@ -194,3 +201,58 @@ class FileSystemTools:
             self.observer.join()
             self.observer = None
             self.watch_paths.clear() 
+
+# Create an instance
+file_tools_instance = FileSystemTools()
+
+# Define standalone functions with docstrings for LangGraph
+@tool
+def list_directory(dir_path: str = '.', pattern: str = '*'):
+    """List files and directories in the given directory, optionally filtered by pattern."""
+    return file_tools_instance.list_directory(dir_path, pattern)
+
+@tool
+def read_file(file_path: str, encoding: str = 'utf-8'):
+    """Read the contents of a file."""
+    return file_tools_instance.read_file(file_path, encoding)
+
+@tool
+def write_file(file_path: str, content: str, encoding: str = 'utf-8'):
+    """Write content to a file, creating it if it doesn't exist."""
+    return file_tools_instance.write_file(file_path, content, encoding)
+
+@tool
+def delete_file(file_path: str):
+    """Delete a file at the given path."""
+    return file_tools_instance.delete_file(file_path)
+
+@tool
+def create_directory(dir_path: str):
+    """Create a new directory at the given path."""
+    return file_tools_instance.create_directory(dir_path)
+
+@tool
+def move_file(source: str, destination: str):
+    """Move a file or directory from source to destination."""
+    return file_tools_instance.move_file(source, destination)
+
+@tool
+def copy_file(source: str, destination: str):
+    """Copy a file or directory from source to destination."""
+    return file_tools_instance.copy_file(source, destination)
+
+@tool
+def get_file_hash(file_path: str, algorithm: str = 'sha256'):
+    """Get the hash of a file using the specified algorithm (default: sha256)."""
+    return file_tools_instance.get_file_hash(file_path, algorithm)
+
+
+llm = ChatGoogleGenerativeAI(
+    api_key=os.getenv("GOOGLE_API_KEY"),
+    model="gemini-2.5-flash-preview-04-17",
+    temperature=0.7
+)
+
+file_tools = [list_directory, read_file, write_file, delete_file, create_directory, move_file, copy_file, get_file_hash]
+
+file_langgraph_agent = create_react_agent(llm, file_tools)

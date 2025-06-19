@@ -1,5 +1,5 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
-from browser_use import Agent, BrowserSession, BrowserProfile, Controller
+from browser_use import Agent, BrowserSession, BrowserProfile
 from dotenv import load_dotenv
 from typing import Any, Optional
 import re

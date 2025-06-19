@@ -18,6 +18,8 @@ from .image_generation import generate_image
 from .document_reader import answer_question
 from .process_tools import ProcessTools
 from .file_system_tools import FileSystemTools
+from core.tools.process_tools import process_langgraph_agent
+from core.tools.file_system_tools import file_langgraph_agent
 
 load_dotenv()
 
@@ -365,112 +367,21 @@ def web_automation(url: Optional[str], task: str = "extract all content") -> dic
         return {"error": str(e)}
 
 @tool
-def get_processes(name_filter: Optional[str] = None) -> Dict:
-    """Get comprehensive information about all running processes, including detailed metrics like CPU usage, memory usage, etc. Optionally filter by process name. Use this method to answer questions related to processes"""
+def process_management(query: str) -> dict:
+    """Interact with system processes. Ask anything about running processes, killing, starting, or getting info. The query should describe what you want to do with processes."""
 
-    return {"result": process_tools.list_processes(name_filter)}
-
-@tool
-def kill_process(pid: int) -> dict:
-    """Terminate a process by its PID."""
-    return {"result": process_tools.kill_process(pid)}
+    result = process_langgraph_agent.invoke({"messages": [("user", query)]})
+    return {"result": result["messages"][-1].content}
 
 @tool
-def get_system_info() -> dict:
-    """Get system-wide resource usage statistics."""
-    return {"result": process_tools.get_system_info()}
+def file_management(query: str) -> dict:
+    """Interact with the file system. Ask anything about listing, reading, writing, deleting, moving, or copying files and directories. The query should describe what you want to do with files."""
 
-@tool
-def start_process(command: str, shell: bool = True) -> dict:
-    """Start a new process with the given command."""
-    return {"result": process_tools.start_process(command, shell)}
+    result = file_langgraph_agent.invoke({"messages": [("user", query)]})
+    return {"result": result["messages"][-1].content}
 
-@tool
-def list_directory(dir_path: str = '.', pattern: str = '*') -> dict:
-    """List files and directories in the given directory, optionally filtered by pattern."""
-    try:
-        items = fs_tools.list_directory(dir_path, pattern)
-        return {"result": items}
-    except Exception as e:
-        return {"error": str(e)}
-
-@tool
-def read_file(file_path: str, encoding: str = 'utf-8') -> dict:
-    """Read the contents of a file."""
-    try:
-        content = fs_tools.read_file(file_path, encoding)
-        return {"result": content}
-    except Exception as e:
-        return {"error": str(e)}
-
-@tool
-def write_file(file_path: str, content: str, encoding: str = 'utf-8') -> dict:
-    """Write content to a file, creating it if it doesn't exist."""
-    try:
-        fs_tools.write_file(file_path, content, encoding)
-        return {"result": f"File '{file_path}' written successfully."}
-    except Exception as e:
-        return {"error": str(e)}
-
-@tool
-def delete_file(file_path: str) -> dict:
-    """Delete a file at the given path."""
-    try:
-        fs_tools.delete_file(file_path)
-        return {"result": f"File '{file_path}' deleted successfully."}
-    except Exception as e:
-        return {"error": str(e)}
-
-@tool
-def create_directory(dir_path: str) -> dict:
-    """Create a new directory at the given path."""
-    try:
-        fs_tools.create_directory(dir_path)
-        return {"result": f"Directory '{dir_path}' created successfully."}
-    except Exception as e:
-        return {"error": str(e)}
-
-@tool
-def move_file(source: str, destination: str) -> dict:
-    """Move a file or directory from source to destination."""
-    try:
-        fs_tools.move_file(source, destination)
-        return {"result": f"Moved '{source}' to '{destination}'."}
-    except Exception as e:
-        return {"error": str(e)}
-
-@tool
-def copy_file(source: str, destination: str) -> dict:
-    """Copy a file or directory from source to destination."""
-    try:
-        fs_tools.copy_file(source, destination)
-        return {"result": f"Copied '{source}' to '{destination}'."}
-    except Exception as e:
-        return {"error": str(e)}
-
-@tool
-def get_file_hash(file_path: str, algorithm: str = 'sha256') -> dict:
-    """Get the hash of a file using the specified algorithm (default: sha256)."""
-    try:
-        hash_val = fs_tools.get_file_hash(file_path, algorithm)
-        return {"result": hash_val}
-    except Exception as e:
-        return {"error": str(e)}
-
-tools = [
-    open_app, google_search, wikipedia, math_calc, play_music, stop_music, get_current_time, get_news, recall_context, send_whatsApp_message,
+tools = [open_app, google_search, wikipedia, math_calc, play_music, stop_music, get_current_time, 
+    get_news, recall_context, send_whatsApp_message,
     screenshot, weather, object_detection_visual, image_recognition, shutdown, restart,
-    set_volume, increase_volume, decrease_volume, exit, image_generation, get_base64_image_from_public, ask_document_question, web_automation,
-    get_processes,
-    kill_process,
-    get_system_info,
-    start_process,
-    list_directory,
-    read_file,
-    write_file,
-    delete_file,
-    create_directory,
-    move_file,
-    copy_file,
-    get_file_hash,
-]
+    set_volume, increase_volume, decrease_volume, exit, image_generation, 
+    get_base64_image_from_public, ask_document_question, web_automation, process_management, file_management]

@@ -5,10 +5,12 @@ import os
 from datetime import datetime, timedelta
 from langchain.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.utils.function_calling import convert_to_openai_tool
-from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from typing import Optional, Literal
 import subprocess
+from langgraph.prebuilt import create_react_agent
+from dotenv import load_dotenv
+
+load_dotenv()
 
 now = datetime.now() + timedelta(minutes=1)
 
@@ -138,39 +140,12 @@ def whatsapp_automation_web(
         return {"result": f"Failed to send WhatsApp message/image: {str(e)}"}
 
 
+tools = [is_whatsapp_desktop_installed, whatsapp_automation_app, whatsapp_automation_web]
+whatsapp_langgraph_agent = create_react_agent(llm, tools)
+
 def get_message_for_whatsapp(query: str) -> dict:
-    tools = [is_whatsapp_desktop_installed, whatsapp_automation_app, whatsapp_automation_web]
-    
-    formatted_tools = [convert_to_openai_tool(t) for t in tools]
-    llm_with_tools = llm.bind_tools(formatted_tools)
-
-    messages = [
-        SystemMessage(
-            content="You are a WhatsApp message sender and know how to format and send messages formally or informally to a particular recipient or group."
-        ),
-        HumanMessage(content=query)
-    ]
-
-    try:
-        result = llm_with_tools.invoke(messages)
-
-        if hasattr(result, "tool_calls") and result.tool_calls:
-            tool_responses = []
-            for tool_call in result.tool_calls:
-                tool = next((t for t in tools if t.name == tool_call['name']), None)
-                if tool:
-                    res = tool.invoke(tool_call["args"])
-                    tool_responses.append(ToolMessage(
-                        content=str(res['result']),
-                        tool_call_id=tool_call["id"]
-                    ))
-
-            final_response = llm.invoke(messages + [result] + tool_responses)
-            return {"result": final_response.content}
-
-        return {"result": result.content}
-
-    except Exception as e:
-        return {"result": f"Failed to process WhatsApp message: {str(e)}"}
+    messages = [("user", query)]
+    result = whatsapp_langgraph_agent.invoke({"messages": messages})
+    return {"result": result["messages"][-1].content}
 
     
